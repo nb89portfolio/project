@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import errorAction from "./errorAction";
 
 type DefinedError = {
   name: string;
@@ -20,7 +21,7 @@ type DefinedErrorInfo = {
   digest: string;
 };
 
-type ErrorReport = DefinedError & DefinedErrorInfo;
+export type ErrorReport = DefinedError & DefinedErrorInfo;
 
 function assignErrorObjectProperty(
   key: keyof Error,
@@ -117,15 +118,33 @@ function findDuplicate(report: ErrorReport, reports: ErrorReport[]) {
   });
 }
 
-function createReport(report: ErrorReport) {}
+function createReport(
+  report: ErrorReport,
+  reports: ErrorReport[],
+  setReports: Dispatch<SetStateAction<ErrorReport[]>>,
+  setStatus: Dispatch<SetStateAction<string>>
+) {
+  setReports([...reports, report]);
 
-function duplicateReport() {}
+  errorAction(report)
+    .then((response) => {
+      setStatus(response);
+    })
+    .catch((error) => {
+      const definedError = defineErrorObject(error);
+      const { name, message, stack } = definedError;
+      const response = `Error ${name}: ${message} (${stack})`;
+
+      setStatus(response);
+    });
+}
 
 function onError(
   error: any,
   info: ErrorInfo,
   reports: ErrorReport[],
-  setReports: Dispatch<SetStateAction<ErrorReport[]>>
+  setReports: Dispatch<SetStateAction<ErrorReport[]>>,
+  setStatus: Dispatch<SetStateAction<string>>
 ) {
   const definedError = defineErrorObject(error);
   const defineErrorInfo = defineErrorInfoObject(info);
@@ -135,7 +154,9 @@ function onError(
 
   const hasDuplicate = foundDuplicate !== undefined;
 
-  const reponse = hasDuplicate ? createReport(report) : duplicateReport();
+  hasDuplicate
+    ? createReport(report, reports, setReports, setStatus)
+    : setStatus("Error has already been reported.");
 }
 
 function onReset(
@@ -153,11 +174,14 @@ function onReset(
 
 export default function ErrorWrapper({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<ErrorReport[]>([]);
+  const [status, setStatus] = useState<string>("");
 
   return (
     <ErrorBoundary
       FallbackComponent={Fallback}
-      onError={(error, info) => onError(error, info, reports, setReports)}
+      onError={(error, info) =>
+        onError(error, info, reports, setReports, setStatus)
+      }
       onReset={onReset}
     >
       {children}
