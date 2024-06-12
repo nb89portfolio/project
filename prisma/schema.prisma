@@ -12,3 +12,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model ReportedError {
+  id Int @id @default(autoincrement())
+  name String
+  message String
+  stack String
+  componentStack String
+  digest String
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+  severity Int
+}
