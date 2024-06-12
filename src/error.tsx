@@ -1,6 +1,12 @@
 "use client";
 
-import { ErrorInfo, ReactNode } from "react";
+import {
+  Dispatch,
+  ErrorInfo,
+  ReactNode,
+  SetStateAction,
+  useState,
+} from "react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 type DefinedError = {
@@ -8,6 +14,13 @@ type DefinedError = {
   message: string;
   stack: string;
 };
+
+type DefinedErrorInfo = {
+  componentStack: string;
+  digest: string;
+};
+
+type ErrorReport = DefinedError & DefinedErrorInfo;
 
 function assignErrorObjectProperty(
   key: keyof Error,
@@ -58,7 +71,72 @@ function Fallback({ error, resetErrorBoundary }: FallbackProps) {
   );
 }
 
-function onError(error: any, info: ErrorInfo) {}
+function assignErrorInfoProperty(
+  key: keyof ErrorInfo,
+  state: "undefined" | "null"
+) {
+  return `Error info ${key} is ${state}.`;
+}
+
+function defineErrorInfoObject(info: ErrorInfo) {
+  const hasComponentStack = info.componentStack !== undefined;
+
+  const definedComponentStack = hasComponentStack
+    ? info.componentStack
+    : assignErrorInfoProperty("componentStack", "undefined");
+
+  const isNotNullComponentStack =
+    definedComponentStack !== null
+      ? definedComponentStack
+      : assignErrorInfoProperty("componentStack", "null");
+
+  const hasDigest = info.digest !== undefined;
+
+  const definedDigest = hasDigest
+    ? info.digest
+    : assignErrorInfoProperty("digest", "undefined");
+
+  const isNotNullDigest =
+    definedDigest !== null
+      ? definedDigest
+      : assignErrorInfoProperty("digest", "null");
+
+  return {
+    componentStack: isNotNullComponentStack,
+    digest: isNotNullDigest,
+  } as DefinedErrorInfo;
+}
+
+function findDuplicate(report: ErrorReport, reports: ErrorReport[]) {
+  return reports.find((loggedReport) => {
+    loggedReport.name === report.name &&
+      loggedReport.message === report.message &&
+      loggedReport.stack === report.stack &&
+      loggedReport.componentStack === report.componentStack &&
+      loggedReport.digest === report.digest;
+  });
+}
+
+function createReport(report: ErrorReport) {}
+
+function duplicateReport() {}
+
+function onError(
+  error: any,
+  info: ErrorInfo,
+  reports: ErrorReport[],
+  setReports: Dispatch<SetStateAction<ErrorReport[]>>
+) {
+  const definedError = defineErrorObject(error);
+  const defineErrorInfo = defineErrorInfoObject(info);
+  const report = { ...definedError, ...defineErrorInfo } as ErrorReport;
+
+  const foundDuplicate = findDuplicate(report, reports);
+
+  const hasDuplicate = foundDuplicate !== undefined;
+
+  const reponse = hasDuplicate ? createReport(report) : duplicateReport();
+}
 
 function onReset(
   details:
@@ -74,10 +152,12 @@ function onReset(
 ) {}
 
 export default function ErrorWrapper({ children }: { children: ReactNode }) {
+  const [reports, setReports] = useState<ErrorReport[]>([]);
+
   return (
     <ErrorBoundary
       FallbackComponent={Fallback}
-      onError={onError}
+      onError={(error, info) => onError(error, info, reports, setReports)}
       onReset={onReset}
     >
       {children}
