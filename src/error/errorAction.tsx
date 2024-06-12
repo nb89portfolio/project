@@ -1,6 +1,6 @@
 "use server";
 
-import { ErrorReport } from "./error";
+import { ErrorReport } from "./types";
 
 export default async function errorAction(report: ErrorReport) {
   try {
