@@ -3,5 +3,9 @@
 import { ErrorReport } from "./error";
 
 export default async function errorAction(report: ErrorReport) {
-  return "";
+  try {
+    return "";
+  } catch (error) {
+    return "";
+  }
 }
