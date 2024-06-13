@@ -1,11 +1,6 @@
 import { FallbackProps } from "react-error-boundary";
 import ResetErrorButton from "./resetButton";
-
-export type DefinedError = {
-  name: string;
-  message: string;
-  stack: string;
-};
+import { DefinedError } from "./types";
 
 function assignErrorObjectProperty(
   key: keyof Error,
@@ -14,7 +9,7 @@ function assignErrorObjectProperty(
   return `Error ${key} is ${state}.` as string;
 }
 
-export function defineErrorObject(error: any) {
+function defineErrorObject(error: any) {
   const isError =
     error instanceof Error ||
     error instanceof SyntaxError ||
