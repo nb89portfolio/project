@@ -9,20 +9,50 @@ import {
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import errorAction from "./errorAction";
-import Fallback, { DefinedError } from "./fallback";
-
-type DefinedErrorInfo = {
-  componentStack: string;
-  digest: string;
-};
-
-export type ErrorReport = DefinedError & DefinedErrorInfo;
+import Fallback from "./fallback";
+import { DefinedError, DefinedErrorInfo, ErrorReport } from "./types";
 
 function assignErrorInfoProperty(
   key: keyof ErrorInfo,
   state: "undefined" | "null"
 ) {
   return `Error info ${key} is ${state}.`;
+}
+
+function assignErrorObjectProperty(
+  key: keyof Error,
+  state: "unknown" | "undefined"
+) {
+  return `Error ${key} is ${state}.` as string;
+}
+
+function defineErrorObject(error: any) {
+  const isError =
+    error instanceof Error ||
+    error instanceof SyntaxError ||
+    error instanceof TypeError;
+
+  const name = isError
+    ? error.name
+    : assignErrorObjectProperty("name", "unknown");
+  const message = isError
+    ? error.message
+    : assignErrorObjectProperty("message", "unknown");
+
+  const stack = isError
+    ? error.stack
+    : assignErrorObjectProperty("stack", "unknown");
+
+  const definedStack =
+    stack !== undefined
+      ? stack
+      : assignErrorObjectProperty("stack", "undefined");
+
+  return {
+    name,
+    message,
+    stack: definedStack,
+  } as DefinedError;
 }
 
 function defineErrorInfoObject(info: ErrorInfo) {
