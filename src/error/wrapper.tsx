@@ -86,11 +86,10 @@ function defineErrorInfoObject(info: ErrorInfo) {
 
 function findDuplicate(report: ErrorReport, reports: ErrorReport[]) {
   return reports.find((loggedReport) => {
-    loggedReport.name === report.name &&
-      loggedReport.message === report.message &&
-      loggedReport.stack === report.stack &&
-      loggedReport.componentStack === report.componentStack &&
-      loggedReport.digest === report.digest;
+    return (
+      loggedReport.name === report.name &&
+      loggedReport.message === report.message
+    );
   });
 }
 
@@ -126,13 +125,19 @@ function onError(
   const defineErrorInfo = defineErrorInfoObject(info);
   const report = { ...definedError, ...defineErrorInfo } as ErrorReport;
 
+  console.log(reports);
+
   const foundDuplicate = findDuplicate(report, reports);
+
+  console.log(foundDuplicate);
 
   const hasDuplicate = foundDuplicate !== undefined;
 
+  console.log(hasDuplicate);
+
   hasDuplicate
-    ? createReport(report, reports, setReports, setStatus)
-    : setStatus("Error has already been reported.");
+    ? setStatus("Error has already been reported.")
+    : createReport(report, reports, setReports, setStatus);
 }
 
 function onReset(
@@ -153,14 +158,17 @@ export default function ErrorWrapper({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<string>("");
 
   return (
-    <ErrorBoundary
-      FallbackComponent={Fallback}
-      onError={(error, info) =>
-        onError(error, info, reports, setReports, setStatus)
-      }
-      onReset={onReset}
-    >
-      {children}
-    </ErrorBoundary>
+    <>
+      <ErrorBoundary
+        FallbackComponent={Fallback}
+        onError={(error, info) =>
+          onError(error, info, reports, setReports, setStatus)
+        }
+        onReset={onReset}
+      >
+        {children}
+      </ErrorBoundary>
+      <div>{status}</div>
+    </>
   );
 }
