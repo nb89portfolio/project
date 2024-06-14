@@ -1,50 +1,75 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
-import { DefinedError, ErrorReport } from "./types";
+import { ErrorReport } from "./types";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-function assignErrorObjectProperty(
-  key: keyof Error,
-  state: "unknown" | "undefined"
-) {
-  return `Error ${key} is ${state}.` as string;
+async function updateReport(orm: PrismaClient, id: number, severity: number) {
+  try {
+    const response = await orm.reportedError.update({
+      where: { id },
+      data: { severity: severity++, updated: new Date() },
+    });
+
+    const isWorking = response !== null || response !== undefined;
+
+    return isWorking
+      ? "Error report has been updated."
+      : "Error report failed to update.";
+  } catch (error) {
+    return buildError(error);
+  }
 }
 
-function defineErrorObject(error: any) {
-  const isError =
-    error instanceof Error ||
-    error instanceof SyntaxError ||
-    error instanceof TypeError;
+async function createReport(orm: PrismaClient, report: ErrorReport) {
+  try {
+    const { name, message, stack, componentStack, digest } = report;
 
-  const name = isError
-    ? error.name
-    : assignErrorObjectProperty("name", "unknown");
+    const response = await orm.reportedError.create({
+      data: {
+        name,
+        message,
+        stack,
+        componentStack,
+        digest,
+        created: new Date(),
+        updated: new Date(),
+        severity: 0,
+      },
+    });
+
+    const isWorking = response !== null || response !== undefined;
+
+    return isWorking
+      ? "Error report has been created."
+      : "Error report failed to created.";
+  } catch (error) {
+    return buildError(error);
+  }
+}
+
+function buildErrorMessage(key: keyof Error, state: "unknown" | "undefined") {
+  return `Error ${key} is ${state}.`;
+}
+
+function buildError(error: unknown) {
+  const isError =
+    error instanceof PrismaClientKnownRequestError ||
+    error instanceof SyntaxError ||
+    error instanceof TypeError ||
+    error instanceof Error;
+
+  const name = isError ? error.name : buildErrorMessage("name", "unknown");
   const message = isError
     ? error.message
-    : assignErrorObjectProperty("message", "unknown");
+    : buildErrorMessage("message", "unknown");
+  const stack = isError ? error.stack : buildErrorMessage("stack", "unknown");
+  const isDefinedStack = stack !== undefined;
+  const definedStack = isDefinedStack
+    ? stack
+    : buildErrorMessage("stack", "undefined");
 
-  const stack = isError
-    ? error.stack
-    : assignErrorObjectProperty("stack", "unknown");
-
-  const definedStack =
-    stack !== undefined
-      ? stack
-      : assignErrorObjectProperty("stack", "undefined");
-
-  return {
-    name,
-    message,
-    stack: definedStack,
-  } as DefinedError;
-}
-
-function createReport() {
-  return "";
-}
-
-function updateReport() {
-  return "";
+  return `Error name: ${name},\nMessage: ${message}.,\n Stack: ${stack}.`;
 }
 
 export default async function errorAction(report: ErrorReport) {
@@ -59,14 +84,12 @@ export default async function errorAction(report: ErrorReport) {
 
     const foundDuplicate = findDuplicate !== null;
 
-    const response = foundDuplicate ? updateReport() : createReport();
+    const response = foundDuplicate
+      ? await updateReport(orm, findDuplicate.id, findDuplicate.severity)
+      : await createReport(orm, report);
 
     return response;
   } catch (error) {
-    const definedError = defineErrorObject(error);
-    const { name, message, stack } = definedError;
-    const response = `Error ${name}: ${message} (${stack})`;
-
-    return response;
+    return buildError(error);
   }
 }
