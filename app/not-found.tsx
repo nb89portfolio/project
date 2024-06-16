@@ -1,4 +1,4 @@
-import NavigateButton from "@/src/NavigateButton";
+import NavigateButton from "@/src/navigation/buttons";
 
 export default function NotFound() {
   return (

@@ -4,6 +4,30 @@ import { PrismaClient } from "@prisma/client";
 import { ErrorReport } from "./types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
+function buildErrorMessage(key: keyof Error, state: "unknown" | "undefined") {
+  return `Error ${key} is ${state}.`;
+}
+
+function buildError(error: unknown) {
+  const isError =
+    error instanceof PrismaClientKnownRequestError ||
+    error instanceof SyntaxError ||
+    error instanceof TypeError ||
+    error instanceof Error;
+
+  const name = isError ? error.name : buildErrorMessage("name", "unknown");
+  const message = isError
+    ? error.message
+    : buildErrorMessage("message", "unknown");
+  const stack = isError ? error.stack : buildErrorMessage("stack", "unknown");
+  const isDefinedStack = stack !== undefined;
+  const definedStack = isDefinedStack
+    ? stack
+    : buildErrorMessage("stack", "undefined");
+
+  return `Error name: ${name},\nMessage: ${message}.,\n Stack: ${definedStack}.`;
+}
+
 async function updateReport(orm: PrismaClient, id: number, severity: number) {
   try {
     const response = await orm.reportedError.update({
@@ -46,30 +70,6 @@ async function createReport(orm: PrismaClient, report: ErrorReport) {
   } catch (error) {
     return buildError(error);
   }
-}
-
-function buildErrorMessage(key: keyof Error, state: "unknown" | "undefined") {
-  return `Error ${key} is ${state}.`;
-}
-
-function buildError(error: unknown) {
-  const isError =
-    error instanceof PrismaClientKnownRequestError ||
-    error instanceof SyntaxError ||
-    error instanceof TypeError ||
-    error instanceof Error;
-
-  const name = isError ? error.name : buildErrorMessage("name", "unknown");
-  const message = isError
-    ? error.message
-    : buildErrorMessage("message", "unknown");
-  const stack = isError ? error.stack : buildErrorMessage("stack", "unknown");
-  const isDefinedStack = stack !== undefined;
-  const definedStack = isDefinedStack
-    ? stack
-    : buildErrorMessage("stack", "undefined");
-
-  return `Error name: ${name},\nMessage: ${message}.,\n Stack: ${stack}.`;
 }
 
 export default async function errorAction(report: ErrorReport) {
