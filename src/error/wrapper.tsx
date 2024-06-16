@@ -11,6 +11,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import errorAction from "./errorAction";
 import Fallback from "./fallback";
 import { DefinedError, DefinedErrorInfo, ErrorReport } from "./types";
+import ErrorStatus from "./status";
 
 function assignErrorInfoProperty(
   key: keyof ErrorInfo,
@@ -26,33 +27,15 @@ function assignErrorObjectProperty(
   return `Error ${key} is ${state}.` as string;
 }
 
-function defineErrorObject(error: any) {
-  const isError =
-    error instanceof Error ||
-    error instanceof SyntaxError ||
-    error instanceof TypeError;
+function defineErrorObject(error: Error) {
+  const name = error.name;
+  const message = error.message;
 
-  const name = isError
-    ? error.name
-    : assignErrorObjectProperty("name", "unknown");
-  const message = isError
-    ? error.message
-    : assignErrorObjectProperty("message", "unknown");
+  const isStackDefined = error.stack !== undefined;
 
-  const stack = isError
-    ? error.stack
-    : assignErrorObjectProperty("stack", "unknown");
+  const stack = isStackDefined ? error.stack : "Error stack is undefined";
 
-  const definedStack =
-    stack !== undefined
-      ? stack
-      : assignErrorObjectProperty("stack", "undefined");
-
-  return {
-    name,
-    message,
-    stack: definedStack,
-  } as DefinedError;
+  return { name, message, stack } as DefinedError;
 }
 
 function defineErrorInfoObject(info: ErrorInfo) {
@@ -125,33 +108,14 @@ function onError(
   const defineErrorInfo = defineErrorInfoObject(info);
   const report = { ...definedError, ...defineErrorInfo } as ErrorReport;
 
-  console.log(reports);
-
   const foundDuplicate = findDuplicate(report, reports);
 
-  console.log(foundDuplicate);
-
   const hasDuplicate = foundDuplicate !== undefined;
-
-  console.log(hasDuplicate);
 
   hasDuplicate
     ? setStatus("Error has already been reported.")
     : createReport(report, reports, setReports, setStatus);
 }
-
-function onReset(
-  details:
-    | {
-        reason: "imperative-api";
-        args: any[];
-      }
-    | {
-        reason: "keys";
-        prev: any[] | undefined;
-        next: any[] | undefined;
-      }
-) {}
 
 export default function ErrorWrapper({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<ErrorReport[]>([]);
@@ -164,11 +128,10 @@ export default function ErrorWrapper({ children }: { children: ReactNode }) {
         onError={(error, info) =>
           onError(error, info, reports, setReports, setStatus)
         }
-        onReset={onReset}
       >
         {children}
       </ErrorBoundary>
-      <div>{status}</div>
+      <ErrorStatus status={status}></ErrorStatus>
     </>
   );
 }
