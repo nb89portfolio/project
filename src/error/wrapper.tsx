@@ -19,14 +19,6 @@ function assignErrorInfoProperty(
 ) {
   return `Error info ${key} is ${state}.`;
 }
-
-function assignErrorObjectProperty(
-  key: keyof Error,
-  state: "unknown" | "undefined"
-) {
-  return `Error ${key} is ${state}.` as string;
-}
-
 function defineErrorObject(error: Error) {
   const name = error.name;
   const message = error.message;
@@ -89,8 +81,8 @@ function createReport(
       setStatus(response);
     })
     .catch((error) => {
-      const definedError = defineErrorObject(error);
-      const { name, message, stack } = definedError;
+      const { name, message, stack } = defineErrorObject(error);
+
       const response = `Error ${name}: ${message} (${stack})`;
 
       setStatus(response);
