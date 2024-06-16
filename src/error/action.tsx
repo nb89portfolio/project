@@ -28,18 +28,34 @@ function buildError(error: unknown) {
   return `Error name: ${name},\nMessage: ${message}.,\n Stack: ${definedStack}.`;
 }
 
+function getOrmConnection() {
+  try {
+    return new PrismaClient();
+  } catch (error) {
+    return buildError(error);
+  }
+}
+
+async function findingDuplicate(report: ErrorReport, orm: PrismaClient) {
+  try {
+    const { name, message, stack, componentStack, digest } = report;
+
+    return await orm.reportedError.findFirst({
+      where: { name, message, stack, componentStack, digest },
+    });
+  } catch (error) {
+    return buildError(error);
+  }
+}
+
 async function updateReport(orm: PrismaClient, id: number, severity: number) {
   try {
-    const response = await orm.reportedError.update({
+    await orm.reportedError.update({
       where: { id },
       data: { severity: severity++, updated: new Date() },
     });
 
-    const isWorking = response !== null || response !== undefined;
-
-    return isWorking
-      ? "Error report has been updated."
-      : "Error report failed to update.";
+    return "Error report has been updated.";
   } catch (error) {
     return buildError(error);
   }
@@ -49,7 +65,7 @@ async function createReport(orm: PrismaClient, report: ErrorReport) {
   try {
     const { name, message, stack, componentStack, digest } = report;
 
-    const response = await orm.reportedError.create({
+    await orm.reportedError.create({
       data: {
         name,
         message,
@@ -62,31 +78,35 @@ async function createReport(orm: PrismaClient, report: ErrorReport) {
       },
     });
 
-    const isWorking = response !== null || response !== undefined;
-
-    return isWorking
-      ? "Error report has been created."
-      : "Error report failed to created.";
+    return "Error report has been created.";
   } catch (error) {
     return buildError(error);
   }
 }
 
 export default async function errorAction(report: ErrorReport) {
-  const { name, message, stack, componentStack, digest } = report;
-
   try {
-    const orm = new PrismaClient();
+    const orm = getOrmConnection();
 
-    const findDuplicate = await orm.reportedError.findFirst({
-      where: { name, message, stack, componentStack, digest },
-    });
+    const isOrmDefined = typeof orm !== "string";
+
+    const findDuplicate = isOrmDefined
+      ? await findingDuplicate(report, orm)
+      : orm;
+
+    const isNotError = typeof findDuplicate !== "string";
 
     const foundDuplicate = findDuplicate !== null;
 
-    const response = foundDuplicate
-      ? await updateReport(orm, findDuplicate.id, findDuplicate.severity)
-      : await createReport(orm, report);
+    const response = isNotError
+      ? foundDuplicate
+        ? await updateReport(
+            orm as PrismaClient,
+            findDuplicate.id,
+            findDuplicate.severity
+          )
+        : await createReport(orm as PrismaClient, report)
+      : findDuplicate;
 
     return response;
   } catch (error) {
