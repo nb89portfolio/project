@@ -1,3 +1,5 @@
+import { PrismaClient, ReportedError } from "@prisma/client";
+
 export type DefinedError = {
   name: string;
   message: string;
