@@ -1,6 +1,7 @@
 "use client";
 
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
+import ValidationInputOutput from "./output/component";
 
 type InputPropsValidation = {
   test: RegExp | string;
@@ -77,19 +78,6 @@ export default function Input({
           }
         ></input>
       </span>
-      <output>{state.output}</output>
     </div>
   );
-}
-
-type ValidationInputOutputProps = {
-  validator: RegExp | string;
-  prompt: string;
-};
-
-function ValidationInputOutput({
-  validator,
-  prompt,
-}: ValidationInputOutputProps) {
-  return <output>{}</output>;
 }
