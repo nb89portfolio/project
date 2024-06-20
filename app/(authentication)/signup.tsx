@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { AuthenticationFieldset, AuthenticationState } from "./types";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
+import {
+  AuthenticationFieldset,
+  AuthenticationForm,
+  AuthenticationState,
+} from "./types";
 
 const signUpFieldset: AuthenticationFieldset = {
   email: {
@@ -49,9 +59,21 @@ function buildState(fieldset: AuthenticationFieldset) {
 
 const initialState: AuthenticationState = buildState(signUpFieldset);
 
+function updateState(
+  event: FormEvent<HTMLInputElement>,
+  setFieldState: Dispatch<SetStateAction<AuthenticationState>>
+) {
+  const { name, value } = event.currentTarget;
+
+  setFieldState((previousState) => {
+    return { ...previousState, [name]: value };
+  });
+}
+
 function buildFieldset(
   fieldset: AuthenticationFieldset,
-  fieldState: AuthenticationState
+  fieldState: AuthenticationState,
+  setFieldState: Dispatch<SetStateAction<AuthenticationState>>
 ) {
   const array = Object.values(fieldset);
 
@@ -59,7 +81,11 @@ function buildFieldset(
     const { label, name, type, placeholder, validation, prompts } = field;
     const state = fieldState[name];
 
-    const isValid = validation.test(state);
+    const isConfirmation = name === "confirmation";
+
+    const isPasswordsValid = state === fieldState["password"];
+
+    const isValid = isConfirmation ? isPasswordsValid : validation.test(state);
 
     const prompt = isValid ? "" : prompts;
 
@@ -67,7 +93,12 @@ function buildFieldset(
       <>
         <span key={name}>
           <label htmlFor={name}>{label}</label>
-          <input type={type} name={name} placeholder={placeholder}></input>
+          <input
+            type={type}
+            name={name}
+            placeholder={placeholder}
+            onChange={(event) => updateState(event, setFieldState)}
+          ></input>
         </span>
         <output htmlFor={name}>{prompt}</output>
       </>
@@ -77,11 +108,16 @@ function buildFieldset(
   return elements;
 }
 
+const initialFormState: AuthenticationForm = {
+  formValid: false,
+  fieldsetDisabled: false,
+};
+
 export default function Signup() {
   const [fieldState, setFieldState] =
     useState<AuthenticationState>(initialState);
 
-  const fieldset = buildFieldset(signUpFieldset, fieldState);
+  const fieldset = buildFieldset(signUpFieldset, fieldState, setFieldState);
 
   return (
     <main>

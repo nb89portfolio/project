@@ -12,5 +12,14 @@ export type AuthenticationFieldset = {
 };
 
 export type AuthenticationState = {
-  [key: string]: string;
+  [key: string]: {
+    value: string;
+    valid: boolean;
+    output: string;
+  };
+};
+
+export type AuthenticationForm = {
+  formValid: boolean;
+  fieldsetDisabled: boolean;
 };
