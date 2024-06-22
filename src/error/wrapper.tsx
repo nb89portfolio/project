@@ -10,7 +10,6 @@ import {
 import { ErrorBoundary } from "react-error-boundary";
 import errorAction from "./action";
 import Fallback from "./fallback";
-import { DefinedError, DefinedErrorInfo, ErrorReport } from "./types";
 import ErrorStatus from "./status";
 
 function assignErrorInfoProperty(

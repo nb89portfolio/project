@@ -1,51 +1,49 @@
 import { FallbackProps } from "react-error-boundary";
 import ResetErrorButton from "./resetButton";
-import { DefinedError } from "./types";
 
-function assignErrorObjectProperty(
-  key: keyof Error,
-  state: "unknown" | "undefined"
-) {
-  return `Error ${key} is ${state}.` as string;
-}
-
-function defineErrorObject(error: any) {
+function defineError(error: any) {
   const isError =
     error instanceof Error ||
     error instanceof SyntaxError ||
     error instanceof TypeError;
 
-  const name = isError
-    ? error.name
-    : assignErrorObjectProperty("name", "unknown");
-  const message = isError
-    ? error.message
-    : assignErrorObjectProperty("message", "unknown");
+  if (isError) {
+    const { name, message } = error;
 
-  const stack = isError
-    ? error.stack
-    : assignErrorObjectProperty("stack", "unknown");
+    const isStackDefined = error.stack !== undefined;
 
-  const definedStack =
-    stack !== undefined
-      ? stack
-      : assignErrorObjectProperty("stack", "undefined");
+    if (isStackDefined) {
+      const { stack } = error;
 
-  return {
-    name,
-    message,
-    stack: definedStack,
-  } as DefinedError;
+      return { name, message, stack };
+    }
+
+    const stack = "Stack is undefined.";
+
+    return { name, message, stack };
+  }
+
+  const name = "Name is unknown.";
+  const message = "Message is unknown.";
+  const stack = "Stack is unknown.";
+
+  return { name, message, stack };
 }
 
 export default function Fallback({ error, resetErrorBoundary }: FallbackProps) {
-  const { name, message, stack } = defineErrorObject(error);
+  const { name, message, stack } = defineError(error);
 
   return (
     <main>
-      <h2>{name}</h2>
-      <p>{message}</p>
-      <details>{stack}</details>
+      <h2>Error</h2>
+      <p>An error has occured.</p>
+      <details>
+        {name}
+        <br></br>
+        {message}
+        <br></br>
+        {stack}
+      </details>
       <ResetErrorButton
         resetErrorBoundary={resetErrorBoundary}
       ></ResetErrorButton>
