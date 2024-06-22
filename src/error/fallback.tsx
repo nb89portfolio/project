@@ -1,5 +1,5 @@
 import { FallbackProps } from "react-error-boundary";
-import ResetErrorButton from "./resetButton";
+import ResetErrorButton from "./reset";
 
 function defineError(error: any) {
   const isError =
@@ -36,13 +36,12 @@ export default function Fallback({ error, resetErrorBoundary }: FallbackProps) {
   return (
     <main>
       <h2>Error</h2>
-      <p>An error has occured.</p>
+      <p>An error has occured and is being submitted.</p>
+      <p>Name: {name}</p>
+      <p>Message: {message}</p>
       <details>
-        {name}
-        <br></br>
-        {message}
-        <br></br>
-        {stack}
+        <summary>Stack:</summary>
+        <p>{stack}</p>
       </details>
       <ResetErrorButton
         resetErrorBoundary={resetErrorBoundary}
