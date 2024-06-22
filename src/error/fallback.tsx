@@ -7,25 +7,25 @@ function defineError(error: any) {
     error instanceof SyntaxError ||
     error instanceof TypeError;
 
-  if (isError) {
-    const { name, message } = error;
+  if (!isError) {
+    const name = "Name is unknown.";
+    const message = "Message is unknown.";
+    const stack = "Stack is unknown.";
 
-    const isStackDefined = error.stack !== undefined;
+    return { name, message, stack };
+  }
 
-    if (isStackDefined) {
-      const { stack } = error;
+  const { name, message } = error;
 
-      return { name, message, stack };
-    }
+  const isStackDefined = error.stack !== undefined;
 
+  if (!isStackDefined) {
     const stack = "Stack is undefined.";
 
     return { name, message, stack };
   }
 
-  const name = "Name is unknown.";
-  const message = "Message is unknown.";
-  const stack = "Stack is unknown.";
+  const { stack } = error;
 
   return { name, message, stack };
 }
