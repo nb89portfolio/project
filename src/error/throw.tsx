@@ -2,10 +2,16 @@
 
 import { useErrorBoundary } from "react-error-boundary";
 
-export default function ThrowError() {
+type Props = {
+  message?: string;
+};
+
+export default function ThrowError({
+  message = "Test closest error boundary.",
+}: Props) {
   const { showBoundary } = useErrorBoundary();
 
-  const newError = new Error("test");
+  const error = new Error(message);
 
-  return <button onClick={() => showBoundary(newError)}>Throw error</button>;
+  return <button onClick={() => showBoundary(error)}>Throw error</button>;
 }

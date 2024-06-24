@@ -3,39 +3,28 @@ import ResetErrorButton from "./reset";
 
 type Props = FallbackProps & { status: string };
 
-type FallbackError = {
-  name: string;
-  message: string;
-  stack: string;
-};
-
 function defineError(error: any) {
   const isError =
     error instanceof Error ||
     error instanceof SyntaxError ||
     error instanceof TypeError;
 
-  if (!isError) {
-    const name = "Name is unknown.";
-    const message = "Message is unknown.";
-    const stack = "Stack is unknown.";
+  const name = isError ? error.name : "Name is unknown.";
+  const message = isError ? error.message : "Message is unknown.";
 
-    return { name, message, stack } as FallbackError;
+  if (isError) {
+    const isStackDefined = error.stack !== undefined;
+
+    const stack = isStackDefined
+      ? (error.stack as string)
+      : "Stack is undefined.";
+
+    return { name, message, stack };
   }
 
-  const { name, message } = error;
+  const stack = "Stack is unknown.";
 
-  const isStackDefined = error.stack !== undefined;
-
-  if (!isStackDefined) {
-    const stack = "Stack is undefined.";
-
-    return { name, message, stack } as FallbackError;
-  }
-
-  const stack = error.stack as string;
-
-  return { name, message, stack } as FallbackError;
+  return { name, message, stack };
 }
 
 export default function ErrorFallback({

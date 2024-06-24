@@ -1,5 +1,5 @@
 import styles from "./page.module.scss";
-import ThrowError from "@/src/error/throwError";
+import ThrowError from "@/src/error/throw";
 
 export default function Home() {
   return (

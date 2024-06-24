@@ -8,123 +8,141 @@ import {
   useState,
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import errorAction from "./action";
 import ErrorFallback from "./fallback";
-import ErrorStatus from "./status";
+import errorAction from "./action";
 
-function assignErrorInfoProperty(
-  key: keyof ErrorInfo,
-  state: "undefined" | "null"
-) {
-  return `Error info ${key} is ${state}.`;
-}
-function defineErrorObject(error: Error) {
-  const name = error.name;
-  const message = error.message;
+type Props = {
+  children: ReactNode;
+};
+
+export type ErrorReport = {
+  name: string;
+  message: string;
+  stack: string;
+  componentStack: string;
+  digest: string;
+};
+
+function buildError(error: Error) {
+  const { name, message } = error;
 
   const isStackDefined = error.stack !== undefined;
 
-  const stack = isStackDefined ? error.stack : "Error stack is undefined";
+  if (isStackDefined) {
+    const stack = error.stack as string;
 
-  return { name, message, stack } as DefinedError;
+    return { name, message, stack };
+  }
+
+  const stack = "Stack is undefined.";
+
+  return { name, message, stack };
 }
 
-function defineErrorInfoObject(info: ErrorInfo) {
-  const hasComponentStack = info.componentStack !== undefined;
+function buildErrorInfoProperty(info: ErrorInfo, key: keyof ErrorInfo) {
+  const isDefined = info[key] !== undefined;
 
-  const definedComponentStack = hasComponentStack
-    ? info.componentStack
-    : assignErrorInfoProperty("componentStack", "undefined");
+  if (!isDefined) {
+    return `Error ${key} is undefined.`;
+  }
 
-  const isNotNullComponentStack =
-    definedComponentStack !== null
-      ? definedComponentStack
-      : assignErrorInfoProperty("componentStack", "null");
+  const isNull = info[key] === null;
 
-  const hasDigest = info.digest !== undefined;
+  if (isNull) {
+    return `Error ${key} is null.`;
+  }
 
-  const definedDigest = hasDigest
-    ? info.digest
-    : assignErrorInfoProperty("digest", "undefined");
-
-  const isNotNullDigest =
-    definedDigest !== null
-      ? definedDigest
-      : assignErrorInfoProperty("digest", "null");
-
-  return {
-    componentStack: isNotNullComponentStack,
-    digest: isNotNullDigest,
-  } as DefinedErrorInfo;
+  return info[key] as string;
 }
 
-function findDuplicate(report: ErrorReport, reports: ErrorReport[]) {
-  return reports.find((loggedReport) => {
+function buildReport(error: Error, info: ErrorInfo) {
+  const { name, message, stack } = buildError(error);
+  const componentStack = buildErrorInfoProperty(info, "componentStack");
+  const digest = buildErrorInfoProperty(info, "digest");
+
+  return { name, message, stack, componentStack, digest } as ErrorReport;
+}
+
+function findDuplicate(newReport: ErrorReport, reports: ErrorReport[]) {
+  return reports.find((report) => {
+    const nameMatch = report.name === newReport.name;
+    const messageMatch = report.message === newReport.message;
+    const stackMatch = report.stack === newReport.stack;
+    const componentStackMatch =
+      report.componentStack === newReport.componentStack;
+    const digestMatch = report.digest === newReport.digest;
+
     return (
-      loggedReport.name === report.name &&
-      loggedReport.message === report.message
+      nameMatch &&
+      messageMatch &&
+      stackMatch &&
+      componentStackMatch &&
+      digestMatch
     );
   });
 }
 
-function createReport(
-  report: ErrorReport,
-  reports: ErrorReport[],
-  setReports: Dispatch<SetStateAction<ErrorReport[]>>,
-  setStatus: Dispatch<SetStateAction<string>>
-) {
-  setReports([...reports, report]);
+function buildFatalErrorMessage(error: unknown) {
+  const isError =
+    error instanceof Error ||
+    error instanceof SyntaxError ||
+    error instanceof TypeError;
 
-  errorAction(report)
-    .then((response) => {
-      setStatus(response);
-    })
-    .catch((error) => {
-      const { name, message, stack } = defineErrorObject(error);
+  if (isError) {
+    const { name, message, stack } = buildError(error);
 
-      const response = `Error ${name}: ${message} (${stack})`;
+    return `Fatal error calling server error action:\n${name}\n${message}\n${stack}`;
+  }
 
-      setStatus(response);
-    });
+  return "Fatal error calling server error action is unknown.";
 }
 
 function onError(
-  error: any,
+  error: Error,
   info: ErrorInfo,
   reports: ErrorReport[],
   setReports: Dispatch<SetStateAction<ErrorReport[]>>,
   setStatus: Dispatch<SetStateAction<string>>
 ) {
-  const definedError = defineErrorObject(error);
-  const defineErrorInfo = defineErrorInfoObject(info);
-  const report = { ...definedError, ...defineErrorInfo } as ErrorReport;
+  const newReport = buildReport(error, info);
 
-  const foundDuplicate = findDuplicate(report, reports);
+  const duplicateReport = findDuplicate(newReport, reports);
 
-  const hasDuplicate = foundDuplicate !== undefined;
+  const isDuplicateDefined = duplicateReport !== undefined;
 
-  hasDuplicate
-    ? setStatus("Error has already been reported.")
-    : createReport(report, reports, setReports, setStatus);
+  if (isDuplicateDefined) {
+    setStatus("Error has already been reported.");
+  } else {
+    const newReportList = [...reports, newReport];
+
+    setReports(newReportList);
+
+    errorAction(newReport)
+      .then((response) => {
+        setStatus(response);
+      })
+      .catch((error) => {
+        const status = buildFatalErrorMessage(error);
+
+        setStatus(status);
+      });
+  }
 }
 
-export default function ErrorWrapper({ children }: { children: ReactNode }) {
-  const [reports, setReports] = useState<ErrorReport[]>([]);
+export default function ErrorWrapper({ children }: Props) {
   const [status, setStatus] = useState<string>("");
+  const [reports, setReports] = useState<ErrorReport[]>([]);
 
   return (
-    <>
-      <ErrorBoundary
-        FallbackComponent={(error, resetErrorBoundary) =>
-          ErrorFallback(error, resetErrorBoundary, status)
-        }
-        onError={(error, info) =>
-          onError(error, info, reports, setReports, setStatus)
-        }
-      >
-        {children}
-      </ErrorBoundary>
-      <ErrorStatus status={status}></ErrorStatus>
-    </>
+    <ErrorBoundary
+      FallbackComponent={(error, resetErrorBoundary) =>
+        ErrorFallback({ error, resetErrorBoundary, status })
+      }
+      onError={(error, info) =>
+        onError(error, info, reports, setReports, setStatus)
+      }
+    >
+      {children}
+    </ErrorBoundary>
   );
 }
