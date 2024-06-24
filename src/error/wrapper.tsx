@@ -9,7 +9,7 @@ import {
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import errorAction from "./action";
-import Fallback from "./fallback";
+import ErrorFallback from "./fallback";
 import ErrorStatus from "./status";
 
 function assignErrorInfoProperty(
@@ -115,7 +115,9 @@ export default function ErrorWrapper({ children }: { children: ReactNode }) {
   return (
     <>
       <ErrorBoundary
-        FallbackComponent={Fallback}
+        FallbackComponent={(error, resetErrorBoundary) =>
+          ErrorFallback(error, resetErrorBoundary, status)
+        }
         onError={(error, info) =>
           onError(error, info, reports, setReports, setStatus)
         }

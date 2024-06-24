@@ -1,60 +1,98 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
-import { ErrorReport } from "./types";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
-function buildErrorPropertyMessage(
-  key: keyof Error,
-  state: "unknown" | "undefined"
-) {
-  return `Error ${key} is ${state}.`;
-}
+type Props = {
+  name: string;
+  message: string;
+  stack: string;
+  componentStack: string;
+  digest: string;
+};
 
-function buildFatalErrorMessage(error: unknown) {
+type ServerError = {
+  procedure: string;
+  name: string;
+  message: string;
+  stack: string;
+};
+
+function defineServerError(error: unknown, description: string) {
   const isError =
-    error instanceof PrismaClientKnownRequestError ||
-    error instanceof SyntaxError ||
+    error instanceof Error ||
     error instanceof TypeError ||
-    error instanceof Error;
+    error instanceof SyntaxError ||
+    error instanceof PrismaClientKnownRequestError;
 
-  const name = isError
-    ? error.name
-    : buildErrorPropertyMessage("name", "unknown");
-  const message = isError
-    ? error.message
-    : buildErrorPropertyMessage("message", "unknown");
-  const stack = isError
-    ? error.stack
-    : buildErrorPropertyMessage("stack", "unknown");
-  const isDefinedStack = stack !== undefined;
-  const definedStack = isDefinedStack
-    ? stack
-    : buildErrorPropertyMessage("stack", "undefined");
+  if (!isError) {
+    const name = "Name is unknown.";
+    const message = "Message is unknown.";
+    const stack = "Message is unknown.";
 
-  return `Error name: ${name},\nMessage: ${message}.,\n Stack: ${definedStack}.`;
+    return { name, message, stack, description };
+  }
+
+  const { name, message } = error;
+
+  const isStackDefined = error.stack !== undefined;
+
+  if (isStackDefined) {
+    const stack = error.stack as string;
+
+    return { name, message, stack, description };
+  }
+
+  const stack = "Stack is undefined";
+
+  return { name, message, stack, description };
 }
 
-async function updateReport(orm: PrismaClient, id: number, severity: number) {
+function instantiateOrmInstance() {
   try {
-    const query = {
-      where: { id },
-      data: { severity: severity++, updated: new Date() },
-    };
+    const ormInstance = new PrismaClient();
 
-    await orm.reportedError.update(query);
-
-    return "Error report has been updated.";
+    return ormInstance;
   } catch (error) {
-    return buildFatalErrorMessage(error);
+    const description =
+      "Fatal server error occured during instanciating orm instance.";
+
+    const response = defineServerError(error, description);
+
+    return response;
   }
 }
 
-async function createReport(orm: PrismaClient, report: ErrorReport) {
+async function findDuplicate(report: Props, ormInstance: PrismaClient) {
   try {
     const { name, message, stack, componentStack, digest } = report;
 
-    const query = {
+    const foundDuplicate = await ormInstance.reportedError.findFirst({
+      where: { name, message, stack, componentStack, digest },
+    });
+
+    return foundDuplicate;
+  } catch (error) {
+    const description =
+      "Fatal server error occured while finding duplicate report.";
+
+    const response = defineServerError(error, description);
+
+    return response;
+  }
+}
+
+function isServerError(error: any): error is ServerError {
+  const test = (error as ServerError).procedure !== undefined;
+
+  return test;
+}
+
+async function createRecord(ormInstance: PrismaClient, report: Props) {
+  try {
+    const { name, message, stack, componentStack, digest } = report;
+
+    const test = await ormInstance.reportedError.create({
       data: {
         name,
         message,
@@ -65,141 +103,53 @@ async function createReport(orm: PrismaClient, report: ErrorReport) {
         updated: new Date(),
         severity: 0,
       },
-    };
-
-    await orm.reportedError.create(query);
-
-    return "Error report has been created.";
-  } catch (error) {
-    return buildFatalErrorMessage(error);
-  }
-}
-
-// new
-
-type DefinedError = {
-  name: string;
-  message: string;
-  stack: string;
-};
-
-type FatalError = {
-  description: string;
-  error: DefinedError;
-};
-
-function defineError(error: unknown) {
-  const isError =
-    error instanceof PrismaClientKnownRequestError ||
-    error instanceof SyntaxError ||
-    error instanceof TypeError ||
-    error instanceof Error;
-
-  if (isError) {
-    const { name, message } = error;
-
-    const isStackDefined = error.stack !== undefined;
-
-    if (isStackDefined) {
-      const { stack } = error;
-
-      return { name, message, stack } as DefinedError;
-    }
-
-    return {
-      name,
-      message,
-      stack: "Stack is undefined.",
-    } as DefinedError;
-  }
-
-  return {
-    name: "Name is unknown.",
-    message: "Message is unknown.",
-    stack: "Stack is unknown.",
-  };
-}
-
-
-function connectOrmInstance() {
-  try {
-    return {
-      type: new PrismaClient(),
-      error: null,
-    } as ReturnData;
-  } catch (error) {
-    const definedError = defineError(error);
-
-    return {
-      type: null,
-      error: {
-        description: "",
-        error: definedError,
-      },
-    } as ReturnData;
-  }
-}
-
-async function findDuplicateReport(
-  report: ErrorReport,
-  ormInstance: PrismaClient
-) {
-  try {
-    const { name, message, stack, componentStack, digest } = report;
-
-    const searchForDuplicate = ormInstance.reportedError.findFirst({
-      where: { name, message, stack, componentStack, digest },
     });
 
-    return {
-      data: 
-    }
+    return "Error record has been made.";
   } catch (error) {
-    const definedError = defineError(error);
+    const description =
+      "Fatal server error occured during creating error record.";
 
-    return {
-      type: null,
-      error: {
-        description: "",
-        error: definedError,
-      },
-    } as ReturnData;
+    const response = defineServerError(error, description);
+
+    return response;
   }
 }
 
-export default async function errorAction(report: ErrorReport) {
+export default async function errorAction({ report }: { report: Props }) {
   try {
-    const ormInstance = connectOrmInstance();
+    const ormInstance = instantiateOrmInstance();
 
-    const hasError = ormInstance.error !== null;
+    const isInstanceError = isServerError(ormInstance);
 
-    if (hasError) {
-      return ormInstance.error as FatalError;
+    if (isInstanceError) {
+      return ormInstance as ServerError;
     }
 
-    const duplicateReport = await findDuplicateReport(
+    const foundDuplicate = await findDuplicate(
       report,
-      ormInstance.type as PrismaClient
+      ormInstance as PrismaClient
     );
 
-    const query = {
-      where: { name, message, stack, componentStack, digest },
-    };
+    const foundDuplicateError = isServerError(foundDuplicate);
 
-    const findDuplicate = await orm.reportedError.findFirst(query);
+    if (foundDuplicateError) {
+      return foundDuplicate as ServerError;
+    }
 
-    const foundDuplicate = findDuplicate !== null;
+    const hasDuplicate = foundDuplicate !== null;
 
-    const response = foundDuplicate
-      ? await updateReport(
-          orm as PrismaClient,
-          findDuplicate.id,
-          findDuplicate.severity
-        )
-      : await createReport(orm as PrismaClient, report);
+    if (!hasDuplicate) {
+      const createdRecord = await createRecord(
+        ormInstance as PrismaClient,
+        report
+      );
+    }
+  } catch (error) {
+    const description = "Fatal server error occured during error action.";
+
+    const response = defineServerError(error, description);
 
     return response;
-  } catch (error) {
-    return buildFatalErrorMessage(error);
   }
 }

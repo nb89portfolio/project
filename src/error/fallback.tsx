@@ -1,6 +1,14 @@
 import { FallbackProps } from "react-error-boundary";
 import ResetErrorButton from "./reset";
 
+type Props = FallbackProps & { status: string };
+
+type FallbackError = {
+  name: string;
+  message: string;
+  stack: string;
+};
+
 function defineError(error: any) {
   const isError =
     error instanceof Error ||
@@ -12,7 +20,7 @@ function defineError(error: any) {
     const message = "Message is unknown.";
     const stack = "Stack is unknown.";
 
-    return { name, message, stack };
+    return { name, message, stack } as FallbackError;
   }
 
   const { name, message } = error;
@@ -22,15 +30,19 @@ function defineError(error: any) {
   if (!isStackDefined) {
     const stack = "Stack is undefined.";
 
-    return { name, message, stack };
+    return { name, message, stack } as FallbackError;
   }
 
-  const { stack } = error;
+  const stack = error.stack as string;
 
-  return { name, message, stack };
+  return { name, message, stack } as FallbackError;
 }
 
-export default function Fallback({ error, resetErrorBoundary }: FallbackProps) {
+export default function ErrorFallback({
+  error,
+  resetErrorBoundary,
+  status,
+}: Props) {
   const { name, message, stack } = defineError(error);
 
   return (
@@ -43,6 +55,7 @@ export default function Fallback({ error, resetErrorBoundary }: FallbackProps) {
         <summary>Stack:</summary>
         <p>{stack}</p>
       </details>
+      <output>{status}</output>
       <ResetErrorButton
         resetErrorBoundary={resetErrorBoundary}
       ></ResetErrorButton>
