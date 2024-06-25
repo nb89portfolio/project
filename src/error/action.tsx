@@ -1,67 +1,37 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
-import { ErrorReport } from "./types";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ErrorReport } from "./wrapper";
 
-function buildErrorMessage(key: keyof Error, state: "unknown" | "undefined") {
-  return `Error ${key} is ${state}.`;
+function buildError(error: Error) {
+  const { name, message } = error;
+
+  const isStackDefined = error.stack !== undefined;
+
+  if (isStackDefined) {
+    const stack = error.stack as string;
+
+    return { name, message, stack };
+  }
+
+  const stack = "Stack is undefined.";
+
+  return { name, message, stack };
 }
 
-function buildError(error: unknown) {
+function buildFatalErrorMessage(error: unknown) {
   const isError =
-    error instanceof PrismaClientKnownRequestError ||
+    error instanceof Error ||
     error instanceof SyntaxError ||
-    error instanceof TypeError ||
-    error instanceof Error;
+    error instanceof TypeError;
 
-  const name = isError ? error.name : buildErrorMessage("name", "unknown");
-  const message = isError
-    ? error.message
-    : buildErrorMessage("message", "unknown");
-  const stack = isError ? error.stack : buildErrorMessage("stack", "unknown");
-  const isDefinedStack = stack !== undefined;
-  const definedStack = isDefinedStack
-    ? stack
-    : buildErrorMessage("stack", "undefined");
+  if (isError) {
+    const { name, message, stack } = buildError(error);
 
-  return `Error name: ${name},\nMessage: ${message}.,\n Stack: ${definedStack}.`;
-}
-
-async function updateReport(orm: PrismaClient, id: number, severity: number) {
-  try {
-    await orm.reportedError.update({
-      where: { id },
-      data: { severity: severity++, updated: new Date() },
-    });
-
-    return "Error report has been updated.";
-  } catch (error) {
-    return buildError(error);
+    return `Fatal error calling server error action:\n${name}\n${message}\n${stack}`;
   }
-}
 
-async function createReport(orm: PrismaClient, report: ErrorReport) {
-  try {
-    const { name, message, stack, componentStack, digest } = report;
-
-    await orm.reportedError.create({
-      data: {
-        name,
-        message,
-        stack,
-        componentStack,
-        digest,
-        created: new Date(),
-        updated: new Date(),
-        severity: 0,
-      },
-    });
-
-    return "Error report has been created.";
-  } catch (error) {
-    return buildError(error);
-  }
+  return "Fatal error calling server error action is unknown.";
 }
 
 export default async function errorAction(report: ErrorReport) {
@@ -70,22 +40,43 @@ export default async function errorAction(report: ErrorReport) {
 
     const orm = new PrismaClient();
 
-    const findDuplicate = await orm.reportedError.findFirst({
+    const duplicateRecord = await orm.reportedError.findFirst({
       where: { name, message, stack, componentStack, digest },
     });
 
-    const foundDuplicate = findDuplicate !== null;
+    const hasDuplicate = duplicateRecord !== null;
 
-    const response = foundDuplicate
-      ? await updateReport(
-          orm as PrismaClient,
-          findDuplicate.id,
-          findDuplicate.severity
-        )
-      : await createReport(orm as PrismaClient, report);
+    if (hasDuplicate) {
+      const updatepRecord = await orm.reportedError.update({
+        where: {
+          id: duplicateRecord.id,
+        },
+        data: {
+          updated: new Date(),
+          severity: duplicateRecord.severity++,
+        },
+      });
 
-    return response;
+      return `Error record has been updated on ${updatepRecord.updated}.`;
+    } else {
+      const createdRecord = await orm.reportedError.create({
+        data: {
+          name,
+          message,
+          stack,
+          componentStack,
+          digest,
+          created: new Date(),
+          updated: new Date(),
+          severity: 0,
+        },
+      });
+
+      return `Error record has been updated on ${createdRecord.updated}.`;
+    }
   } catch (error) {
-    return buildError(error);
+    const status = buildFatalErrorMessage(error);
+
+    return status;
   }
 }
