@@ -1,51 +1,50 @@
 import { FallbackProps } from "react-error-boundary";
-import ResetErrorButton from "./resetButton";
-import { DefinedError } from "./types";
+import ResetErrorButton from "./reset";
 
-function assignErrorObjectProperty(
-  key: keyof Error,
-  state: "unknown" | "undefined"
-) {
-  return `Error ${key} is ${state}.` as string;
-}
+type Props = FallbackProps & { status: string };
 
-function defineErrorObject(error: any) {
+function defineError(error: any) {
   const isError =
     error instanceof Error ||
     error instanceof SyntaxError ||
     error instanceof TypeError;
 
-  const name = isError
-    ? error.name
-    : assignErrorObjectProperty("name", "unknown");
-  const message = isError
-    ? error.message
-    : assignErrorObjectProperty("message", "unknown");
+  const name = isError ? error.name : "Name is unknown.";
+  const message = isError ? error.message : "Message is unknown.";
 
-  const stack = isError
-    ? error.stack
-    : assignErrorObjectProperty("stack", "unknown");
+  if (isError) {
+    const isStackDefined = error.stack !== undefined;
 
-  const definedStack =
-    stack !== undefined
-      ? stack
-      : assignErrorObjectProperty("stack", "undefined");
+    const stack = isStackDefined
+      ? (error.stack as string)
+      : "Stack is undefined.";
 
-  return {
-    name,
-    message,
-    stack: definedStack,
-  } as DefinedError;
+    return { name, message, stack };
+  }
+
+  const stack = "Stack is unknown.";
+
+  return { name, message, stack };
 }
 
-export default function Fallback({ error, resetErrorBoundary }: FallbackProps) {
-  const { name, message, stack } = defineErrorObject(error);
+export default function ErrorFallback({
+  error,
+  resetErrorBoundary,
+  status,
+}: Props) {
+  const { name, message, stack } = defineError(error);
 
   return (
     <main>
-      <h2>{name}</h2>
-      <p>{message}</p>
-      <details>{stack}</details>
+      <h2>Error</h2>
+      <p>An error has occured and is being submitted.</p>
+      <p>Name: {name}</p>
+      <p>Message: {message}</p>
+      <details>
+        <summary>Stack:</summary>
+        <p>{stack}</p>
+      </details>
+      <output>{status}</output>
       <ResetErrorButton
         resetErrorBoundary={resetErrorBoundary}
       ></ResetErrorButton>
