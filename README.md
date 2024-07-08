@@ -9,7 +9,6 @@ I do not have any authority or credentials to critique web development. I have w
 1.  Node project initialization.
     1.  ~~Npm init.~~
     2.  ~~Typescript init.~~
-    3.  Code splitting tooling.
 2.  Server initialization.
     1.  Determine technology.
 3.  Client intialization.
