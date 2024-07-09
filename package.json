@@ -2,15 +2,17 @@
   "name": "project",
   "version": "1.0.0",
   "description": "Personal project.",
-  "main": "index.js",
+  "main": "./src/server/index.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "start": "node ./dist/server/server.js",
+    "build": "tsc && cp ./src/**/*.html ./dist/**/ && cp ./src/**/*.css ./dist/**/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Navraj Bains",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^20.14.10",
     "typescript": "^4.9.3"
   }
 }
