@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "target": "ES2023",
+    "target": "ESNext",
     "sourceMap": true,
     "outDir": "dist"
   },
