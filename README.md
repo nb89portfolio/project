@@ -1,18 +1,30 @@
-# Project
+# Personal Project
 
 ## Description
 
-I do not have any authority or credentials to critique web development. I have worked with HTML, CSS, and JS when it was first developed and introduced to the public. I stepped away for nearly two decades and have decided to come back and learn the more about web development as a personal hobby. I hate what I view as the current experience for most people entering the web development for the first time. This is likely a hypocritical therapy project to make my feel better about my own inadequacies in understanding.
+Just messing around.
 
-## Targets
+## Targerts
 
-1.  Node project initialization.
-    1.  ~~Npm init.~~
-    2.  ~~Typescript init.~~
-2.  Server initialization.
-    1.  Determine technology.
-3.  Client intialization.
-    1.  Determine technology.
-4.  Database initialization.
-    1.  Determine technology.
-5.
+1. Cleaning defaults.
+1. Build supplements.
+   1. Catch all not found.
+      1. Component.
+   1. Loading page.
+      1. Wrapper.
+      1. Fallback.
+   1. Error page.
+      1. Wrapper.
+      1. Fallback.
+      1. Server action.
+      1. Database connection.
+         1. Sqlite connection.
+         1. Prisma connection.
+         1. database development.
+            1. Define actions.
+            1. Define data per action.
+            1. Naturalize tables.
+      1. Implement database.
+      1. Test error component.
+1. Build home page.
+   1. Define nessessary components.
