@@ -9,11 +9,11 @@ Just messing around.
 ~1. Cleaning defaults.~
 
 1. Build supplements.
-   1. Catch all not found.
-      1. Component.
-   1. Loading page.
-      1. Wrapper.
-      1. Fallback.
+   ~1. Catch all not found.~
+   ~1. Component.~
+   ~1. Loading page.~
+   ~1. Wrapper.~
+   ~1. Fallback.~
    1. Error page.
       1. Wrapper.
       1. Fallback.
