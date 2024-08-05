@@ -1,10 +1,8 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Main from "@/src/components/main/component";
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <h2>home</h2>
-    </main>
-  );
+  const title = "home page";
+  const content = <></>;
+
+  return <Main title={title} content={content}></Main>;
 }
