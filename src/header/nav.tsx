@@ -1,7 +1,0 @@
-"use client";
-
-type Props = {};
-
-export default function Nav({}: Props) {
-  return <nav></nav>;
-}
