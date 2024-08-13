@@ -6,7 +6,7 @@ type Props = {
   content: ReactNode;
 };
 
-export default function Main({ title, content }: Props) {
+export default function MainLayout({ title, content }: Props) {
   return (
     <main className={styles.main}>
       <h2>{title}</h2>

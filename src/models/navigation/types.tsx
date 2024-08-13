@@ -1,1 +1,6 @@
-export type Route = "/" | "back";
+export type Route =
+  | {
+      path: "/";
+      text: "Home";
+    }
+  | { path: ""; text: "Back" };

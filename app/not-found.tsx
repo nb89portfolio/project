@@ -1,8 +1,9 @@
 "use client";
 
-import Main from "@/src/components/main/component";
-import NavigateButton from "@/src/components/navigate/component";
+import MainLayout from "@/src/components/main/layout";
+import NavigationButton from "@/src/components/navigate/component";
 import parseUrlString from "@/src/functions/parseUrlString";
+import { Route } from "@/src/models/navigation/types";
 import { usePathname } from "next/navigation";
 
 export default function NotFound() {
@@ -11,13 +12,17 @@ export default function NotFound() {
 
   const title = "Page not Found";
 
+  const homeRoute: Route = { path: "/", text: "Home" };
+
+  const backRoute: Route = { path: "", text: "Back" };
+
   const content = (
     <>
-      <p>The page you are looking for, {url}, is not found.</p>
-      <NavigateButton route="/"></NavigateButton>
-      <NavigateButton route="back"></NavigateButton>
+      <p>The page {url} is not found.</p>
+      <NavigationButton route={homeRoute}></NavigationButton>
+      <NavigationButton route={backRoute}></NavigationButton>
     </>
   );
 
-  return <Main title={title} content={content}></Main>;
+  return <MainLayout title={title} content={content}></MainLayout>;
 }

@@ -1,8 +1,8 @@
-import Main from "@/src/components/main/component";
+import MainLayout from "@/src/components/main/layout";
 
 export default function Home() {
   const title = "home page";
   const content = <p>home page</p>;
 
-  return <Main title={title} content={content}></Main>;
+  return <MainLayout title={title} content={content}></MainLayout>;
 }

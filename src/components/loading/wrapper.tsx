@@ -1,12 +1,12 @@
 import { ReactNode, Suspense } from "react";
-import Fallback from "./fallback";
+import LoadingFallback from "./fallback";
 
 type Props = {
   children: ReactNode;
 };
 
-export default function Loading({ children }: Props) {
-  const fallback = <Fallback></Fallback>;
+export default function LoadingWrapper({ children }: Props) {
+  const fallback = <LoadingFallback></LoadingFallback>;
 
   return <Suspense fallback={fallback}>{children}</Suspense>;
 }

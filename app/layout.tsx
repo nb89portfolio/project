@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Loading from "@/src/components/loading/wrapper";
+import LoadingWrapper from "@/src/components/loading/wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Loading>{children}</Loading>
+        <LoadingWrapper>{children}</LoadingWrapper>
       </body>
     </html>
   );
