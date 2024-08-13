@@ -10,25 +10,13 @@ type Props = {
 function buildText(route: Route) {
   const isHome = route === "/";
 
-  if (isHome) {
-    const text = "Home";
-
-    return text;
-  } else {
-    const text = parseUrlString(route);
-
-    return text;
-  }
+  return isHome ? "Home" : parseUrlString(route);
 }
 
 function navigateTo(router: AppRouterInstance, route: Route) {
   const isBack = route === "back";
 
-  if (isBack) {
-    router.back();
-  } else {
-    router.push(route);
-  }
+  isBack ? router.back() : router.push(route);
 }
 
 export default function NavigateButton({ route }: Props) {
