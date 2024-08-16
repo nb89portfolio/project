@@ -2,9 +2,29 @@
 
 import MainLayout from "@/src/components/main/layout";
 import NavigationButton from "@/src/components/navigate/component";
-import parseUrlString from "@/src/functions/parseUrlString";
 import { Route } from "@/src/models/navigation/types";
 import { usePathname } from "next/navigation";
+
+function getCapatalizedStrings(strings: String[]) {
+  return strings.map((word) => {
+    const firstChararacter = word.charAt(0);
+    const capatalizedCharacter = firstChararacter.toUpperCase();
+    const otherCharacters = word.slice(1);
+    const rebuiltString = capatalizedCharacter + otherCharacters;
+
+    return rebuiltString;
+  });
+}
+
+function parseUrlString(pathname: string) {
+  const noSlashString = pathname.replaceAll("/", " ");
+  const lowerCaseString = noSlashString.toLowerCase();
+  const seperatedStrings = lowerCaseString.split(" ");
+  const capatalizedStrings = getCapatalizedStrings(seperatedStrings);
+  const rebuildUrl = capatalizedStrings.join(" ");
+
+  return rebuildUrl;
+}
 
 export default function NotFound() {
   const pathname = usePathname();
