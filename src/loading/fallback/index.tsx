@@ -1,4 +1,4 @@
-import LoadingRefresh from "./refresh";
+import LoadingRefresh from "../refresh";
 
 export default function LoadingFallback() {
   return (
