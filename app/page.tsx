@@ -1,8 +1,13 @@
-export default function Home() {
+import Main from "@/src/main/component";
+
+export default async function Home() {
+  const title = "Home Page";
+
+  throw new Error();
+
   return (
-    <main>
-      <h2>Home</h2>
+    <Main title={title}>
       <p>This is the home page.</p>
-    </main>
+    </Main>
   );
 }
