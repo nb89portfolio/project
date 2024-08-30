@@ -1,18 +1,12 @@
 "use client";
 
-import { ErrorReportsContext } from "@/src/error/context";
-import { ErrorReport, ErrorReports, NextError } from "@/src/error/types";
+import { ErrorReport, ErrorRecords, NextJSError } from "@/src/error/types";
 import Main from "@/src/main/component";
-import {
-  Dispatch,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { useContext, useEffect } from "react";
 import reportError from "@/src/error/action";
+import { ErrorRecordContext } from "@/src/error/context";
 
-function defineError(error: NextError) {
+function defineError(error: NextJSError) {
   const { name, message } = error;
 
   const isStackDefined = error.stack !== undefined;
@@ -30,42 +24,49 @@ function defineError(error: NextError) {
   return { name, message, stack, digest } as ErrorReport;
 }
 
-function handleError(
-  report: ErrorReport,
-  { errorReports, setState }: ErrorReports,
-  setStatusState: Dispatch<SetStateAction<string>>
-) {
-  const duplicates = errorReports.find((errorReport) => {
+function isDuplicate(report: ErrorReport, records: ErrorReport[]) {
+  const foundDuplicate = records.find((record) => {
     return (
-      report.name === errorReport.name &&
-      report.message === errorReport.message &&
-      report.stack === errorReport.stack &&
-      report.digest === errorReport.digest
+      report.name === record.name &&
+      report.message === record.message &&
+      report.stack === record.stack &&
+      report.digest === record.digest
     );
   });
 
-  const hasDuplciate = duplicates !== undefined;
+  const hasDuplicate = foundDuplicate !== undefined;
+
+  return hasDuplicate as boolean;
+}
+
+function handleError(report: ErrorReport, errorState: ErrorRecords) {
+  const { records, setRecords, setStatus } = errorState;
+
+  const hasDuplciate = isDuplicate(report, records);
 
   if (hasDuplciate) {
-    setStatusState("Error has already been reported.");
+    setStatus("Error has already been reported.");
   } else {
-    setState([...errorReports, report]);
+    setRecords([...records, report]);
 
     reportError(report)
       .then((response) => {
-        setStatusState(response);
+        setStatus(response);
       })
       .catch((error) => {
-        const isError = error instanceof Error;
+        const hasError = (error as Error).name !== undefined;
 
-        if (isError) {
-          const { name, message, stack } = defineError(error as Error);
+        if (hasError) {
+          const { name, message, stack, digest } = defineError(error as Error);
 
-          setStatusState(`Message: [${name}] ${message}. ${stack}`);
+          const newMessage = `${name}, ${message}, ${stack}, ${digest}`;
+
+          setStatus(newMessage);
         } else {
-          setStatusState(
-            "Unknown error occured when client tries to report error to server."
-          );
+          const message =
+            "Unknown error occured when client tries to report error to server.";
+
+          setStatus(message);
         }
       });
   }
@@ -75,7 +76,7 @@ export default function Error({
   error,
   reset,
 }: {
-  error: NextError;
+  error: NextJSError;
   reset: () => void;
 }) {
   const title = "Fatal Error";
@@ -84,20 +85,18 @@ export default function Error({
 
   const { name, message, stack } = definedError;
 
-  const errorState = useContext(ErrorReportsContext);
-
-  const [state, setState] = useState<string>("");
+  const errorState = useContext(ErrorRecordContext);
 
   useEffect(() => {
-    handleError(definedError, errorState, setState);
-  }, [definedError, errorState]);
+    handleError(definedError, errorState);
+  }, []);
 
   return (
     <Main title={title}>
       <h3>{name}</h3>
       <p>{message}</p>
       <button onClick={() => reset()}>Reset Error</button>
-      <output>{state}</output>
+      <output>{errorState.status}</output>
       <details>{stack}</details>
     </Main>
   );
