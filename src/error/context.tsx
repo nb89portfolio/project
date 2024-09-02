@@ -1,23 +1,11 @@
 "use client";
 
-import { createContext, ReactNode, useState } from "react";
-import { ErrorReports, ErrorReport } from "./types";
+import { createContext } from "react";
+import { ErrorRecord } from "./types";
 
-export const ErrorReportsContext = createContext<ErrorReports>({
-  errorReports: [],
-  setState: () => {},
+const ErrorRecordContext = createContext<ErrorRecord>({
+  records: [],
+  setRecords: () => {},
 });
 
-export default function ErrorReportWrapper({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [errorReports, setState] = useState<ErrorReport[]>([]);
-
-  return (
-    <ErrorReportsContext.Provider value={{ errorReports, setState }}>
-      {children}
-    </ErrorReportsContext.Provider>
-  );
-}
+export default ErrorRecordContext;

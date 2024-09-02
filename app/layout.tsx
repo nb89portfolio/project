@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import LoadingWrapper from "@/src/loading/component";
 import ErrorRecordProvider from "@/src/error/provider";
+import UserIdProvider from "@/src/user/provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <header>Test header</header>
-        <ErrorRecordProvider>
-          <LoadingWrapper>{children}</LoadingWrapper>
-        </ErrorRecordProvider>
-        <header>Test footer</header>
+        <UserIdProvider>
+          <header>Test header</header>
+          <ErrorRecordProvider>
+            <LoadingWrapper>{children}</LoadingWrapper>
+          </ErrorRecordProvider>
+          <header>Test footer</header>
+        </UserIdProvider>
       </body>
     </html>
   );
