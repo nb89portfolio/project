@@ -10,27 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UserId {
-  id  Int @id @unique @default(autoincrement())
-  email String
+model User {
+  id       Int    @id @unique @default(autoincrement())
+  email    String @unique
   username String @unique
-  ErrorInstances ErrorInstances[]
 }
 
 model ErrorRecord {
-  id             Int              @id @unique @default(autoincrement())
-  name           String
-  message        String
-  stack          String
-  digest         String
-  ErrorInstances ErrorInstances[]
+  id      Int    @id @unique @default(autoincrement())
+  name    String
+  message String
+  stack   String
+  digest  String
 }
 
 model ErrorInstances {
-  id      Int         @id @unique @default(autoincrement())
-  error   ErrorRecord @relation(fields: [errorId], references: [id])
-  errorId Int
-  user  UserId @relation(fields: [userId], references: [id])
-  userId Int
-  updated DateTime
+  id            Int      @id @unique @default(autoincrement())
+  errorRecordId Int      @unique
+  userId        Int      @unique
+  created       DateTime
+  updated       DateTime
 }

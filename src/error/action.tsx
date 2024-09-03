@@ -1,40 +1,72 @@
-"use server";
+'use server';
 
-import prismaClient from "@/prisma/client";
-import { ErrorDefinition } from "./types";
-
-async function findDuplciateReport(error: ErrorDefinition) {
-  try {
-    const { name, message, stack, digest } = error;
-
-    const foundDuplicate = await prismaClient.errorRecord.findFirst({
-      where: { name, message, stack, digest },
-    });
-
-    const hasDuplicate = foundDuplicate !== null;
-
-    return hasDuplicate as boolean;
-  } catch (error) {
-    return error as Error;
-  }
-}
+import { ErrorDefinition } from './types';
+import prismaClient from '@/prisma/client';
 
 export default async function reportErrorRecord(
-  error: ErrorDefinition,
+  report: ErrorDefinition,
   username: string
 ) {
   try {
-    const hasDuplicate = await findDuplciateReport(error);
+    const record = await prismaClient.errorRecord.findFirst({
+      where: { ...report },
+    });
 
-    const hasError = hasDuplicate instanceof Error;
+    const hasRecord = record !== null;
 
-    if (hasError) {
-      return hasDuplicate;
-    }
+    const user = await prismaClient.user.findFirst({ where: { username } });
 
-    if (hasDuplicate as boolean) {
+    const hasUid = user !== null;
+
+    const uid = hasUid ? user.id : 0;
+
+    if (hasRecord) {
+      const instance = await prismaClient.errorInstances.findFirst({
+        where: { errorRecordId: record.id, userId: uid },
+      });
+
+      const hasInstance = instance !== null;
+
+      if (hasInstance) {
+        const updatedInstance = await prismaClient.errorInstances.update({
+          where: {
+            id: instance.id,
+          },
+          data: {
+            updated: new Date(),
+          },
+        });
+
+        return 'Error instance is updated.' as string;
+      } else {
+        const createdInstance = await prismaClient.errorInstances.create({
+          data: {
+            errorRecordId: record.id,
+            userId: uid,
+            created: new Date(),
+            updated: new Date(),
+          },
+        });
+
+        return 'Error instance created.' as string;
+      }
+    } else {
+      const createdReport = await prismaClient.errorRecord.create({
+        data: { ...report },
+      });
+
+      const createdInstance = await prismaClient.errorInstances.create({
+        data: {
+          errorRecordId: createdReport.id,
+          userId: uid,
+          created: new Date(),
+          updated: new Date(),
+        },
+      });
+
+      return 'Error record and instance is created.' as string;
     }
   } catch (error) {
-    return error as Error;
+    return error;
   }
 }
