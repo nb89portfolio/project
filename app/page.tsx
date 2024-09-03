@@ -1,8 +1,14 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Main from "@/src/main/component";
 
-export default function Home() {
+export default async function Home() {
+  const title = "Home Page";
 
-  return <main className={styles.main}>home page</main>;
+  throw new Error();
+
+  return (
+    <Main title={title}>
+      <p>This is the home page.</p>
+    </Main>
+  );
 
 }
