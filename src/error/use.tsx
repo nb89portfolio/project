@@ -11,6 +11,7 @@ import reportErrorRecord from './action';
 import { NextJSError, ErrorDefinition } from './types';
 import ErrorRecordContext from './context';
 import UseUID from '../user/user';
+import setCache from '../cache/set';
 
 function defineErrorStack(error: Error) {
   const hasStack = error.stack !== undefined;
