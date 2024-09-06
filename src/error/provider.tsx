@@ -20,7 +20,7 @@ export default function ErrorRecordProvider({
   }, []);
 
   useEffect(() => {
-    setCache('error', records);
+    setCache('error', records, 24);
   }, [records]);
 
   return (

@@ -1,3 +1,8 @@
 type CacheKey = 'error';
 
-export type { CacheKey };
+type CacheLimiter = {
+  limit: number;
+  date: number;
+};
+
+export type { CacheKey, CacheLimiter };
