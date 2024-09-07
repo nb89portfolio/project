@@ -1,7 +1,7 @@
-import Main from "@/src/main/component";
+import Main from '@/src/main/component';
 
 export default async function Home() {
-  const title = "Home Page";
+  const title = 'Home Page';
 
   throw new Error();
 
@@ -10,5 +10,4 @@ export default async function Home() {
       <p>This is the home page.</p>
     </Main>
   );
-
 }
