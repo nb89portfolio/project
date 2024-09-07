@@ -1,8 +1,12 @@
-type CacheKey = 'error';
+type ClientCacheKey = 'error';
 
-type CacheLimiter = {
-  limit: number;
-  date: number;
+type ClientCache = {
+  user: string;
+  data: any;
+  time: {
+    limit: number;
+    current: number;
+  };
 };
 
-export type { CacheKey, CacheLimiter };
+export type { ClientCacheKey, ClientCache };

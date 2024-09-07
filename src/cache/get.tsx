@@ -1,34 +1,43 @@
 'use client';
 
-import { CacheKey, CacheLimiter } from './types';
+import { ClientCache, ClientCacheKey } from './types';
 
-export default function getCache<T, R>(key: CacheKey, base: R): T | R {
-  if (typeof window !== 'undefined') {
-    const item = localStorage.getItem(key);
+export default function getClientCache<Data, Revert>(
+  key: ClientCacheKey,
+  user: string,
+  revert: Revert
+): Data | Revert {
+  try {
+    const secondsInHours = 3600;
 
-    if (item !== null) {
-      const limitKey = 'limit: ' + key;
-      const limit = localStorage.getItem(limitKey);
+    const cache = localStorage.getItem(key);
 
-      if (limit !== null) {
-        const limiter: CacheLimiter = JSON.parse(limit);
+    const isCacheNull = cache === null;
 
-        const newTime = new Date().getTime() / 3600;
-
-        const difference = limiter.date - newTime;
-
-        const evaluation = difference < limiter.limit;
-
-        if (evaluation) {
-          return JSON.parse(item);
-        } else {
-          localStorage.setItem(key, '');
-          localStorage.setItem(limitKey, '');
-
-          return base;
-        }
-      }
+    if (isCacheNull) {
+      return revert;
     }
+
+    const payload: ClientCache = JSON.parse(cache);
+
+    const isUserValid = user === payload.user;
+
+    if (!isUserValid) {
+      return revert;
+    }
+
+    const updated = new Date().getTime() / secondsInHours;
+
+    const differace = updated - payload.time.current;
+
+    const isValid = differace < payload.time.limit;
+
+    if (isValid) {
+      return payload.data as Data;
+    }
+
+    return revert;
+  } catch (error) {
+    throw error;
   }
-  return base;
 }

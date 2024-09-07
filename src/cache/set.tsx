@@ -1,25 +1,26 @@
 'use client';
 
-import { CacheKey, CacheLimiter } from './types';
+import { ClientCache, ClientCacheKey } from './types';
 
-export default function setCache<T>(
-  key: CacheKey,
-  value: T,
-  hourlyLifeTime: number
+export default function setClientCache<Data>(
+  key: ClientCacheKey,
+  user: string,
+  data: Data,
+  limit: number
 ): void {
-  const secondsInHours = 3600;
+  try {
+    const secondsInHours = 3600;
 
-  const date = new Date();
-  const time = date.getTime();
-  const hours = time / secondsInHours;
+    const current = new Date().getTime() / secondsInHours;
 
-  const timeLimiter: CacheLimiter = {
-    limit: hourlyLifeTime,
-    date: hours,
-  };
+    const time = { limit, current };
 
-  const limitKey = 'limit: ' + key;
+    const payload: ClientCache = { user, data, time };
 
-  localStorage.setItem(limitKey, JSON.stringify(timeLimiter));
-  localStorage.setItem(key, JSON.stringify(value));
+    const string = JSON.stringify(payload);
+
+    localStorage.setItem(key, string);
+  } catch (error) {
+    throw error;
+  }
 }
