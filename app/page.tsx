@@ -10,4 +10,5 @@ export default async function Home() {
       <p>This is the home page.</p>
     </Main>
   );
+
 }
