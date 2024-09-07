@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 :root {
   --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 }
+=======
+
+>>>>>>> dev
 
 * {
   box-sizing: border-box;
@@ -14,9 +18,4 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }
