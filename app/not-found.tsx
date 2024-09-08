@@ -1,6 +1,6 @@
 import Main from '@/src/main/component';
-import NavigationButton from '@/src/navigate/component';
-import UseUrl from '@/src/url/component';
+import UseNavigationButton from '@/src/navigate/provider';
+import UseUrl from '@/src/url/provider';
 
 export default function NotFound() {
   const title = 'Page Not Found';
@@ -13,8 +13,8 @@ export default function NotFound() {
       <p>
         <UseUrl preText={preText} postText={postText}></UseUrl>
       </p>
-      <NavigationButton route={'back'}></NavigationButton>
-      <NavigationButton route={'home'}></NavigationButton>
+      <UseNavigationButton route={'back'}></UseNavigationButton>
+      <UseNavigationButton route={'home'}></UseNavigationButton>
     </Main>
   );
 }

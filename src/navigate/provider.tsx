@@ -1,23 +1,22 @@
-"use client";
+'use client';
 
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useRouter } from "next/navigation";
-
-type Route = "home" | "refresh" | "back";
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { useRouter } from 'next/navigation';
+import { Route } from './types';
 
 function navigateTo(route: Route, router: AppRouterInstance) {
   switch (route) {
-    case "back":
+    case 'back':
       router.back();
       break;
-    case "refresh":
+    case 'refresh':
       router.refresh();
       break;
-    case "home":
-      router.push("/");
+    case 'home':
+      router.push('/');
       break;
     default:
-      router.push("/");
+      router.push('/');
   }
 }
 
@@ -30,7 +29,7 @@ function captalizeRouteText(route: Route) {
   return rejoinStrings as string;
 }
 
-export default function NavigationButton({ route }: { route: Route }) {
+export default function UseNavigationButton({ route }: { route: Route }) {
   const router = useRouter();
   const text = captalizeRouteText(route);
 
