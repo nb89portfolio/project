@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
-export default function Main({
+export default function UseMain({
   title,
   children,
 }: {

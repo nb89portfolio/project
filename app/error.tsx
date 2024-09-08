@@ -2,7 +2,7 @@
 
 import { NextJSError } from '@/src/error/types';
 import UseErrorRecord from '@/src/error/use';
-import Main from '@/src/main/component';
+import Main from '@/src/main/provider';
 
 export default function Error({
   error,

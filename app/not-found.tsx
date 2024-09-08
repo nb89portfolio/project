@@ -1,4 +1,4 @@
-import Main from '@/src/main/component';
+import Main from '@/src/main/provider';
 import UseNavigationButton from '@/src/navigate/provider';
 import UseUrl from '@/src/url/provider';
 
