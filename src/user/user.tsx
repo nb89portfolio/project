@@ -1,10 +1,12 @@
 'use client';
 
-import { useContext } from 'react';
-import UidContext from './context';
+import { useContext } from "react";
+import UserIdContext from "./context";
 
-export default function UseUid() {
-  const uid = useContext(UidContext);
+
+export default function UseUID() {
+  const uid = useContext(UserIdContext);
+
 
   return uid;
 }

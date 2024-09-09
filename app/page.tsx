@@ -1,4 +1,6 @@
-import Main from '@/src/main/provider';
+
+import Main from '@/src/main/component';
+
 
 export default async function Home() {
   const title = 'Home Page';
