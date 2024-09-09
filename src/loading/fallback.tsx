@@ -1,6 +1,4 @@
-
 import UseNavigationButton from '../navigate/provider';
-
 
 export default function LoadingFallback() {
   return (
@@ -11,7 +9,6 @@ export default function LoadingFallback() {
       <UseNavigationButton route='refresh'></UseNavigationButton>
       <UseNavigationButton route='back'></UseNavigationButton>
       <UseNavigationButton route='home'></UseNavigationButton>
-
     </main>
   );
 }

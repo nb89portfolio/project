@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createContext } from "react";
-import { ErrorRecord } from "./types";
+import { createContext } from 'react';
+import { ErrorRecord } from './types';
 
 const ErrorRecordContext = createContext<ErrorRecord>({
   records: [],

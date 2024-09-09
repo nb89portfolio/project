@@ -30,5 +30,5 @@ export default function UseUrl() {
 
   const url = getText(pathname);
 
-  return <>{url}</>;
+  return url;
 }

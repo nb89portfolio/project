@@ -1,7 +1,4 @@
-
-
-import Main from '@/src/main/component';
-
+import UseMain from '@/src/main/provider';
 
 export default async function Home() {
   const title = 'Home Page';
@@ -9,8 +6,8 @@ export default async function Home() {
   throw new Error();
 
   return (
-    <Main title={title}>
+    <UseMain title={title}>
       <p>This is the home page.</p>
-    </Main>
+    </UseMain>
   );
 }
