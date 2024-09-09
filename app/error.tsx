@@ -1,3 +1,4 @@
+
 'use client';
 
 import { NextJSError } from '@/src/error/types';
@@ -11,6 +12,7 @@ export default function Error({
   error: NextJSError;
   reset: () => void;
 }) {
+
   const title = 'Fatal Error';
 
   return (
