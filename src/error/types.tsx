@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from 'react';
 type NextJSError = Error & { digest?: string };
 
 type ErrorReport = {
-
   name: string;
   message: string;
   stack: string;
@@ -11,7 +10,6 @@ type ErrorReport = {
 };
 
 type ErrorRecord = {
-
   records: ErrorReport[];
   setRecords: Dispatch<SetStateAction<ErrorReport[]>>;
 };

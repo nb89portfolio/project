@@ -1,11 +1,9 @@
-
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import UseLoading from '@/src/loading/provider';
 import ErrorRecordProvider from '@/src/error/provider';
 import UidProvider from '@/src/user/provider';
-
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +18,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
     <html lang='en'>
       <body className={inter.className}>
         <UidProvider>
@@ -30,7 +27,6 @@ export default function RootLayout({
           </ErrorRecordProvider>
           <header>Test footer</header>
         </UidProvider>
-
       </body>
     </html>
   );
