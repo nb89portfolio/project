@@ -1,15 +1,16 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import UserIdContext from './context';
-import { UserId } from './types';
 
-export default function UserIdProvider({ children }: { children: ReactNode }) {
-  const [userId, setUID] = useState<UserId>({ username: '', email: '' });
+import { UidState } from './types';
+import UidContext from './context';
+
+export default function UidProvider({ children }: { children: ReactNode }) {
+  const [uid, setUid] = useState<UidState>({ username: '' });
 
   return (
-    <UserIdContext.Provider value={{ ...userId, setUID }}>
+    <UidContext.Provider value={{ ...uid, setUid }}>
       {children}
-    </UserIdContext.Provider>
+    </UidContext.Provider>
   );
 }
