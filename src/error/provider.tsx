@@ -1,32 +1,33 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { ErrorDefinition } from './types';
+-
 import ErrorRecordContext from './context';
 import getClientCache from '../cache/get';
 import setClientCache from '../cache/set';
-import UseUID from '../user/user';
+import { ErrorReport } from './types';
+import UseUid from '../user/user';
 
 export default function ErrorRecordProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [records, setRecords] = useState<ErrorDefinition[]>([]);
 
-  const uid = UseUID();
+  const [records, setRecords] = useState<ErrorReport[]>([]);
 
-  const user = uid.username;
+  const { username } = UseUid();
 
   useEffect(() => {
-    const data = getClientCache<ErrorDefinition[], []>('error', user, []);
+    const data = getClientCache<ErrorReport[], []>('error', username, []);
 
     setRecords(data);
-  }, [user]);
+  }, [username]);
 
   useEffect(() => {
-    setClientCache('error', user, records, 24);
-  }, [records, user]);
+    setClientCache('error', username, records, 24);
+  }, [records, username]);
+
 
   return (
     <ErrorRecordContext.Provider value={{ records, setRecords }}>

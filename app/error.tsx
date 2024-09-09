@@ -1,9 +1,9 @@
-"use client";
 
-import { NextJSError } from "@/src/error/types";
-import UseErrorRecord from "@/src/error/use";
-import Main from "@/src/main/component";
-import { useState } from "react";
+'use client';
+
+import { NextJSError } from '@/src/error/types';
+import UseErrorRecord from '@/src/error/use';
+import Main from '@/src/main/provider';
 
 export default function Error({
   error,
@@ -12,7 +12,8 @@ export default function Error({
   error: NextJSError;
   reset: () => void;
 }) {
-  const title = "Fatal Error";
+
+  const title = 'Fatal Error';
 
   return (
     <Main title={title}>

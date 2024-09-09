@@ -1,12 +1,12 @@
-"use client";
 
-import { createContext } from "react";
-import { UID } from "./types";
+'use client';
 
-const UserIdContext = createContext<UID>({
-  username: "",
-  email: "",
-  setUID: () => {},
+import { createContext } from 'react';
+import { Uid } from './types';
+
+const UidContext = createContext<Uid>({
+  username: '',
+  setUid: () => {},
 });
 
-export default UserIdContext;
+export default UidContext;

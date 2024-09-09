@@ -1,12 +1,12 @@
-import { Dispatch, SetStateAction } from "react";
 
-type UserId = {
+import { Dispatch, SetStateAction } from 'react';
+
+type UidState = {
   username: string;
-  email: string;
 };
 
-type UID = UserId & {
-  setUID: Dispatch<SetStateAction<UserId>>;
+type Uid = UidState & {
+  setUid: Dispatch<SetStateAction<UidState>>;
 };
 
-export type { UserId, UID };
+export type { UidState, Uid };
