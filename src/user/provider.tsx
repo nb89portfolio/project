@@ -5,7 +5,7 @@ import { ReactNode, useState } from 'react';
 import { UidState } from './types';
 import UidContext from './context';
 
-export default function UserIdProvider({ children }: { children: ReactNode }) {
+export default function UidProvider({ children }: { children: ReactNode }) {
   const [uid, setUid] = useState<UidState>({ username: '' });
 
   return (

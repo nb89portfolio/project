@@ -5,13 +5,11 @@ import UseUrl from '@/src/url/provider';
 export default function NotFound() {
   const title = 'Page Not Found';
 
-  const preText = 'The page that you are looking for,';
-  const postText = ', cannot be found.';
-
   return (
     <Main title={title}>
       <p>
-        <UseUrl preText={preText} postText={postText}></UseUrl>
+        The page that you are looking for,
+        <UseUrl></UseUrl>, cannot be found.
       </p>
       <UseNavigationButton route={'back'}></UseNavigationButton>
       <UseNavigationButton route={'home'}></UseNavigationButton>
