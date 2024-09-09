@@ -1,10 +1,10 @@
 'use server';
 
-import { ErrorDefinition } from './types';
 import prismaClient from '@/prisma/client';
+import { ErrorReport } from './types';
 
 export default async function reportErrorRecord(
-  report: ErrorDefinition,
+  report: ErrorReport,
   username: string
 ) {
   try {

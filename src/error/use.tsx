@@ -3,14 +3,14 @@
 import {
   Dispatch,
   SetStateAction,
+  useState,
   useContext,
   useEffect,
-  useState,
 } from 'react';
+import UseUid from '../user/user';
 import reportErrorRecord from './action';
-import { NextJSError, ErrorDefinition } from './types';
 import ErrorRecordContext from './context';
-import UseUID from '../user/user';
+import { ErrorReport, NextJSError } from './types';
 
 function defineErrorStack(error: Error) {
   const hasStack = error.stack !== undefined;
@@ -21,18 +21,18 @@ function defineErrorStack(error: Error) {
 }
 
 function defineErrorDigest(error: Error) {
-  const assertError = error as NextJSError;
+  const assertedType = error as NextJSError;
 
-  const hasDigest = (assertError.digest as keyof NextJSError) !== undefined;
+  const hasDigest = (assertedType.digest as keyof NextJSError) !== undefined;
 
   const digest = hasDigest
-    ? (assertError.digest as string)
+    ? (assertedType.digest as string)
     : 'Digest is undefined';
 
   return digest;
 }
 
-function defineError(error: NextJSError | unknown) {
+function defineErrorDefinition(error: NextJSError | unknown) {
   const hasError = error instanceof Error;
 
   if (!hasError) {
@@ -41,7 +41,7 @@ function defineError(error: NextJSError | unknown) {
     const stack = 'Stack is unknown.';
     const digest = 'Digest cannot be provided.';
 
-    return { name, message, stack, digest } as ErrorDefinition;
+    return { name, message, stack, digest } as ErrorReport;
   }
 
   const { name, message } = error;
@@ -50,13 +50,10 @@ function defineError(error: NextJSError | unknown) {
 
   const digest = defineErrorDigest(error);
 
-  return { name, message, stack, digest } as ErrorDefinition;
+  return { name, message, stack, digest } as ErrorReport;
 }
 
-function findDuplicateErrorRecord(
-  report: ErrorDefinition,
-  records: ErrorDefinition[]
-) {
+function findDuplicateErrorRecord(report: ErrorReport, records: ErrorReport[]) {
   const { name, message, stack, digest } = report;
 
   const foundRecord = records.find((record) => {
@@ -75,12 +72,12 @@ function findDuplicateErrorRecord(
 
 function reportError(
   error: NextJSError | unknown,
-  records: ErrorDefinition[],
-  setRecords: Dispatch<SetStateAction<ErrorDefinition[]>>,
+  records: ErrorReport[],
+  setRecords: Dispatch<SetStateAction<ErrorReport[]>>,
   setStatus: Dispatch<SetStateAction<string>>,
   username: string
 ) {
-  const report = defineError(error);
+  const report = defineErrorDefinition(error);
 
   const foundDuplicate = findDuplicateErrorRecord(report, records);
 
@@ -118,7 +115,7 @@ export default function UseErrorRecord({
 
   const { records, setRecords } = useContext(ErrorRecordContext);
 
-  const { username } = UseUID();
+  const { username } = UseUid();
 
   useEffect(() => {
     reportError(error, records, setRecords, setStatus, username);

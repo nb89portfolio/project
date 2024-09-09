@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 type NextJSError = Error & { digest?: string };
 
-type ErrorDefinition = {
+type ErrorReport = {
   name: string;
   message: string;
   stack: string;
@@ -10,8 +10,8 @@ type ErrorDefinition = {
 };
 
 type ErrorRecord = {
-  records: ErrorDefinition[];
-  setRecords: Dispatch<SetStateAction<ErrorDefinition[]>>;
+  records: ErrorReport[];
+  setRecords: Dispatch<SetStateAction<ErrorReport[]>>;
 };
 
-export type { NextJSError, ErrorDefinition, ErrorRecord };
+export type { NextJSError, ErrorReport, ErrorRecord };

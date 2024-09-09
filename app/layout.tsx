@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import UseLoading from '@/src/loading/component';
+import UseLoading from '@/src/loading/provider';
 import ErrorRecordProvider from '@/src/error/provider';
 import UserIdProvider from '@/src/user/provider';
 
