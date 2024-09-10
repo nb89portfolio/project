@@ -25,7 +25,7 @@ export default function RootLayout({
           <ErrorRecordProvider>
             <UseLoading>{children}</UseLoading>
           </ErrorRecordProvider>
-          <header>Test footer</header>
+          <footer>Test footer</footer>
         </UidProvider>
       </body>
     </html>

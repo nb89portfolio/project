@@ -1,18 +1,13 @@
-import UseMain from '@/src/main/provider';
 import UseNavigationButton from '@/src/navigate/provider';
-import UseUrl from '@/src/url/provider';
+import styles from './page.module.css'
 
 export default function NotFound() {
-  const title = 'Page Not Found';
-
   return (
-    <UseMain title={title}>
-      <p>
-        The page that you are looking for,
-        <UseUrl></UseUrl>, cannot be found.
-      </p>
+    <main className={styles.main}>
+      <h2>Page not Found</h2>
+      <p>The page that you are looking for cannot be found.</p>
       <UseNavigationButton route={'back'}></UseNavigationButton>
       <UseNavigationButton route={'home'}></UseNavigationButton>
-    </UseMain>
+    </main>
   );
 }

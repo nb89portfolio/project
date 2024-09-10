@@ -2,7 +2,7 @@
 
 import { NextJSError } from '@/src/error/types';
 import UseErrorRecord from '@/src/error/use';
-import UseMain from '@/src/main/provider';
+import styles from './page.module.css';
 
 export default function Error({
   error,
@@ -11,12 +11,11 @@ export default function Error({
   error: NextJSError;
   reset: () => void;
 }) {
-  const title = 'Fatal Error';
-
   return (
-    <UseMain title={title}>
+    <main className={styles.main}>
+      <h2>Fatal Error</h2>
       <UseErrorRecord error={error}></UseErrorRecord>
       <button onClick={reset}>Reset Error</button>
-    </UseMain>
+    </main>
   );
 }

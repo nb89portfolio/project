@@ -1,4 +1,4 @@
-import UseMain from '@/src/main/provider';
+import styles from './page.module.css';
 
 export default async function Home() {
   const title = 'Home Page';
@@ -6,8 +6,8 @@ export default async function Home() {
   throw new Error();
 
   return (
-    <UseMain title={title}>
+    <main className={styles.main}>
       <p>This is the home page.</p>
-    </UseMain>
+    </main>
   );
 }
