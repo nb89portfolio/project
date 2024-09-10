@@ -25,10 +25,10 @@ function getText(pathname: string) {
   return url;
 }
 
-export default function UseUrl() {
+export default function HeaderUrl() {
   const pathname = usePathname();
 
   const url = getText(pathname);
 
-  return url;
+  return <h1>{url}</h1>;
 }

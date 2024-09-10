@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import UseLoading from '@/src/loading/provider';
+import LoadingProvider from '@/src/loading/provider';
 import ErrorRecordProvider from '@/src/error/provider';
 import UidProvider from '@/src/user/provider';
+import HeaderProvider from '@/src/header.tsx/provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,9 +22,9 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <UidProvider>
-          <header>Test header</header>
+          <HeaderProvider></HeaderProvider>
           <ErrorRecordProvider>
-            <UseLoading>{children}</UseLoading>
+            <LoadingProvider>{children}</LoadingProvider>
           </ErrorRecordProvider>
           <footer>Test footer</footer>
         </UidProvider>
