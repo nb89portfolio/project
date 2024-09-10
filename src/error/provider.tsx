@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import getClientCache from '../cache/get';
 import setClientCache from '../cache/set';
 import { ErrorReport } from './types';
-import UseUid from '../user/user';
+import UseUid from '../user/use';
 import ErrorRecordContext from './context';
 
 export default function ErrorRecordProvider({
@@ -18,6 +18,8 @@ export default function ErrorRecordProvider({
 
   useEffect(() => {
     const data = getClientCache<ErrorReport[], []>('error', username, []);
+
+    console.log('test', data);
 
     setRecords(data);
   }, [username]);

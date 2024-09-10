@@ -7,7 +7,7 @@ import {
   useContext,
   useEffect,
 } from 'react';
-import UseUid from '../user/user';
+import UseUid from '../user/use';
 import reportErrorRecord from './action';
 import ErrorRecordContext from './context';
 import { ErrorReport, NextJSError } from './types';
@@ -91,13 +91,13 @@ function reportError(
 
     reportErrorRecord(report, username)
       .then((response) => {
-        const isString = typeof response === 'string';
+        const isNotNull = response.data !== null;
 
-        if (isString) {
-          setStatus(response);
+        if (isNotNull) {
+          setStatus(response.data);
         } else {
           setStatus('Failed to report error from server to database.');
-          reportError(response, records, setRecords, setStatus, username);
+          reportError(response.error, records, setRecords, setStatus, username);
         }
       })
       .catch((newError) => {

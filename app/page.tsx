@@ -1,6 +1,8 @@
+'use client';
+
 import styles from './page.module.css';
 
-export default async function Home() {
+export default function Home() {
   const title = 'Home Page';
 
   throw new Error();

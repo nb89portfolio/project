@@ -1,10 +1,30 @@
-'use client';
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useState,
+} from 'react';
 
-import { useContext } from 'react';
-import UserIdContext from './context';
+type UidState = {
+  username: string;
+};
 
-export default function UseUID() {
-  const uid = useContext(UserIdContext);
+type Uid = UidState & {
+  setUid: Dispatch<SetStateAction<UidState>>;
+};
 
-  return uid;
+export const UidContext = createContext<Uid>({
+  username: '',
+  setUid: () => {},
+});
+
+export default function UidProvider({ children }: { children: ReactNode }) {
+  const [uid, setUid] = useState<UidState>({ username: '' });
+
+  return (
+    <UidContext.Provider value={{ ...uid, setUid }}>
+      {children}
+    </UidContext.Provider>
+  );
 }
