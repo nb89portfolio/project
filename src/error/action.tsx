@@ -1,7 +1,7 @@
 'use server';
 
 import prismaClient from '@/prisma/client';
-import { ErrorReport } from './types';
+import { ErrorReport } from './provider';
 
 export default async function reportErrorRecord(
   report: ErrorReport,
@@ -37,7 +37,7 @@ export default async function reportErrorRecord(
           },
         });
 
-        return { data: 'Error instance is updated.', error: null };
+        return { data: 'Error instance is updated.' };
       } else {
         const createdInstance = await prismaClient.errorInstances.create({
           data: {
@@ -48,7 +48,7 @@ export default async function reportErrorRecord(
           },
         });
 
-        return { data: 'Error instance created.', error: null };
+        return { data: 'Error instance created.' };
       }
     } else {
       const createdReport = await prismaClient.errorRecord.create({
@@ -64,9 +64,9 @@ export default async function reportErrorRecord(
         },
       });
 
-      return { data: 'Error record and instance is created.', error: null };
+      return { data: 'Error record and instance is created.' };
     }
   } catch (error) {
-    return { data: null, error: error };
+    return { data: 'test' };
   }
 }

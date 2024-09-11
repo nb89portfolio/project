@@ -1,4 +1,4 @@
-import UseNavigationButton from '@/src/navigate/provider';
+import NotFoundNavigation from '@/src/missing/navigation';
 import styles from './page.module.css';
 
 export default function NotFound() {
@@ -6,8 +6,7 @@ export default function NotFound() {
     <main className={styles.main}>
       <h2>Page not Found</h2>
       <p>The page that you are looking for cannot be found.</p>
-      <UseNavigationButton route={'back'}></UseNavigationButton>
-      <UseNavigationButton route={'home'}></UseNavigationButton>
+      <NotFoundNavigation></NotFoundNavigation>
     </main>
   );
 }

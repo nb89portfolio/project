@@ -1,11 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import styles from './page.module.css';
 
 export default function Home() {
-  const title = 'Home Page';
-
-  throw new Error();
+  useEffect(() => {
+    throw new Error();
+  }, []);
 
   return (
     <main className={styles.main}>

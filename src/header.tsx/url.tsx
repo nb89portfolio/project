@@ -20,7 +20,11 @@ function getText(pathname: string) {
   const lowercase = removedSlash.toLowerCase();
   const splitStrings = lowercase.split(' ');
   const recapatalizedStrings = getCapatalizedStrings(splitStrings);
-  const url = recapatalizedStrings.join(' ');
+  const builtUrl = recapatalizedStrings.join(' ');
+
+  const isEmpty = builtUrl === ' ';
+
+  const url = isEmpty ? 'Home' : builtUrl;
 
   return url;
 }

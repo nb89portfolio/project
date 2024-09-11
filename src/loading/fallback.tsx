@@ -1,5 +1,4 @@
 import styles from '../../app/page.module.css';
-import { useRouter } from 'next/navigation';
 import LoadingNavigation from './navigation';
 
 export default function LoadingFallback() {
