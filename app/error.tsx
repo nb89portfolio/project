@@ -6,55 +6,47 @@ import {
   NextJSError,
 } from '@/src/error/provider';
 import styles from './page.module.css';
-import { Suspense, useContext, useEffect } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect } from 'react';
 import { UidContext } from '@/src/user/provider';
 import reportErrorRecord from '@/src/error/action';
+import clientCache from '@/src/cache/provider';
 
-function defineErrorStack(error: Error) {
+function defineErrorDefinition(error: NextJSError) {
+  const { name, message } = error;
+
   const hasStack = error.stack !== undefined;
 
   const stack = hasStack ? (error.stack as string) : 'Stack is undefined.';
 
-  return stack;
-}
+  const hasDigest = (error.digest as keyof NextJSError) !== undefined;
 
-function defineErrorDigest(error: Error) {
-  const assertedType = error as NextJSError;
-
-  const hasDigest = (assertedType.digest as keyof NextJSError) !== undefined;
-
-  const digest = hasDigest
-    ? (assertedType.digest as string)
-    : 'Digest is undefined';
-
-  return digest;
-}
-
-function defineErrorDefinition(error: NextJSError | unknown) {
-  const hasError = error instanceof Error;
-
-  if (!hasError) {
-    const name = 'Unknown Error.';
-    const message = 'Error is unknown.';
-    const stack = 'Stack is unknown.';
-    const digest = 'Digest cannot be provided.';
-
-    return { name, message, stack, digest } as ErrorReport;
-  }
-
-  const { name, message } = error as NextJSError;
-
-  const stack = defineErrorStack(error as NextJSError);
-
-  const digest = defineErrorDigest(error as NextJSError);
+  const digest = hasDigest ? (error.digest as string) : 'Digest is undefined';
 
   return { name, message, stack, digest } as ErrorReport;
 }
 
-function findDuplicateErrorRecord(report: ErrorReport, records: ErrorReport[]) {
+function handleError(
+  error: NextJSError,
+  records: ErrorReport[],
+  setRecords: Dispatch<SetStateAction<ErrorReport[]>>,
+  setStatus: Dispatch<SetStateAction<string>>,
+  username: string
+) {
+  const report = defineErrorDefinition(error);
+
   const { name, message, stack, digest } = report;
 
-  const foundRecord = records.find((record) => {
+  const cache = clientCache.get<ErrorReport[], []>('error', username, []);
+
+  const isCacheNull = cache.length === 0;
+
+  const isRecordsNull = records.length === 0;
+
+  const isCacheValid = isCacheNull > isRecordsNull;
+
+  const updatedRecords = isCacheValid ? cache : records;
+
+  const foundRecord = updatedRecords.find((record) => {
     return (
       record.name === name &&
       record.message === message &&
@@ -65,7 +57,29 @@ function findDuplicateErrorRecord(report: ErrorReport, records: ErrorReport[]) {
 
   const hasDuplicate = foundRecord !== undefined;
 
-  return hasDuplicate;
+  if (hasDuplicate) {
+    setStatus('Error has already been reported.');
+  } else {
+    const newRecord = [...updatedRecords, report];
+
+    clientCache.set<ErrorReport[]>('error', username, newRecord, 24);
+
+    setRecords(newRecord);
+
+    reportErrorRecord(report, username)
+      .then((response) => {
+        const isString = typeof response.data === 'string';
+
+        if (isString) {
+          setStatus(response.data);
+        } else {
+          setStatus('Failed to report error from server to database.');
+        }
+      })
+      .catch((newError) => {
+        setStatus('Failed to report error from client to server.');
+      });
+  }
 }
 
 export default function Error({
@@ -76,36 +90,16 @@ export default function Error({
   reset: () => void;
 }) {
   const errorState = useContext(ErrorRecordContext);
+
+  const { records, setRecords, setStatus } = errorState;
+
   const uid = useContext(UidContext);
 
+  const { username } = uid;
+
   useEffect(() => {
-    const report = defineErrorDefinition(error);
-    const foundDuplicate = findDuplicateErrorRecord(report, errorState.records);
-
-    if (foundDuplicate) {
-      errorState.setStatus('Error has already been reported.');
-    } else {
-      const newRecord = [...errorState.records, report];
-
-      errorState.setRecords(newRecord);
-
-      reportErrorRecord(report, uid.username)
-        .then((response) => {
-          const isString = typeof response.data === 'string';
-
-          if (isString) {
-            errorState.setStatus(response.data);
-          } else {
-            errorState.setStatus(
-              'Failed to report error from server to database.'
-            );
-          }
-        })
-        .catch((newError) => {
-          errorState.setStatus('Failed to report error from client to server.');
-        });
-    }
-  }, [error, errorState, uid.username]);
+    handleError(error, records, setRecords, setStatus, username);
+  }, []);
 
   return (
     <main className={styles.main}>
