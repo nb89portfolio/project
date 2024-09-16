@@ -1,26 +1,35 @@
 'use client';
 
-import {
-  ErrorRecordContext,
-  ErrorReport,
-  NextJSError,
-} from '@/src/error/provider';
+import { ErrorRecordContext, ErrorReport } from '@/src/error/provider';
 import styles from './page.module.css';
 import { Dispatch, SetStateAction, useContext, useEffect } from 'react';
 import { UidContext } from '@/src/user/provider';
 import reportErrorRecord from '@/src/error/action';
 import clientCache from '@/src/cache/provider';
+import NextJSError from '@/src/error/class';
+import handleServerError from '@/src/error/server';
 
-function defineErrorDefinition(error: NextJSError) {
-  const { name, message } = error;
+function defineErrorDefinition(error: NextJSError | unknown) {
+  const isError = error instanceof NextJSError;
 
-  const hasStack = error.stack !== undefined;
+  if (isError) {
+    const { name, message } = error;
 
-  const stack = hasStack ? (error.stack as string) : 'Stack is undefined.';
+    const hasStack = error.stack !== undefined;
 
-  const hasDigest = (error.digest as keyof NextJSError) !== undefined;
+    const stack = hasStack ? (error.stack as string) : 'Stack is undefined.';
 
-  const digest = hasDigest ? (error.digest as string) : 'Digest is undefined';
+    const hasDigest = (error.digest as keyof NextJSError) !== undefined;
+
+    const digest = hasDigest ? (error.digest as string) : 'Digest is undefined';
+
+    return { name, message, stack, digest } as ErrorReport;
+  }
+
+  const name = 'Error name is undeifned.';
+  const message = 'Error message is undefined.';
+  const stack = 'Error stack is undefined.';
+  const digest = 'Error digest is undefined.';
 
   return { name, message, stack, digest } as ErrorReport;
 }
@@ -38,13 +47,15 @@ function handleError(
 
   const cache = clientCache.get<ErrorReport[], []>('error', username, []);
 
-  const isCacheNull = cache.length === 0;
+  const isCacheUndefined = cache === undefined;
 
-  const isRecordsNull = records.length === 0;
+  const isCacheNull = isCacheUndefined ? 0 : cache.length;
+
+  const isRecordsNull = records.length;
 
   const isCacheValid = isCacheNull > isRecordsNull;
 
-  const updatedRecords = isCacheValid ? cache : records;
+  const updatedRecords = isCacheValid ? (cache as ErrorReport[] | []) : records;
 
   const foundRecord = updatedRecords.find((record) => {
     return (
@@ -68,16 +79,30 @@ function handleError(
 
     reportErrorRecord(report, username)
       .then((response) => {
-        const isString = typeof response.data === 'string';
+        const data = response.data;
+
+        const isString = typeof data === 'string';
 
         if (isString) {
-          setStatus(response.data);
+          setStatus(data);
         } else {
-          setStatus('Failed to report error from server to database.');
+          setStatus('Server failed to submit error report.');
+
+          const { name, message, stack, digest } = data;
+
+          const newError = new NextJSError(name, message, stack, digest);
+
+          handleError(newError, records, setRecords, setStatus, username);
         }
       })
-      .catch((newError) => {
-        setStatus('Failed to report error from client to server.');
+      .catch((error) => {
+        setStatus('Client failed to submit error report.');
+
+        const { name, message, stack, digest } = defineErrorDefinition(error);
+
+        const newError = new NextJSError(name, message, stack, digest);
+
+        handleError(newError, records, setRecords, setStatus, username);
       });
   }
 }

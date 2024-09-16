@@ -2,6 +2,7 @@
 
 import prismaClient from '@/prisma/client';
 import { ErrorReport } from './provider';
+import handleServerError from './server';
 
 export default async function reportErrorRecord(
   report: ErrorReport,
@@ -67,6 +68,8 @@ export default async function reportErrorRecord(
       return { data: 'Error record and instance is created.' };
     }
   } catch (error) {
-    return { data: 'test' };
+    const data = await handleServerError(error);
+
+    return { data };
   }
 }

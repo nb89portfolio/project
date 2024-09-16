@@ -1,6 +1,8 @@
-type ClientCacheKey = 'error';
+'use client';
 
-type ClientCachePayload = {
+type Keys = 'error';
+
+type Payload = {
   user: string;
   data: any;
   time: {
@@ -9,12 +11,7 @@ type ClientCachePayload = {
   };
 };
 
-function setClientCache<Data>(
-  key: ClientCacheKey,
-  user: string,
-  data: Data,
-  limit: number
-): void {
+function set<Data>(key: Keys, user: string, data: Data, limit: number): void {
   try {
     const secondsInHours = 3600;
 
@@ -22,21 +19,19 @@ function setClientCache<Data>(
 
     const time = { limit, current };
 
-    const payload: ClientCachePayload = { user, data, time };
+    const payload: Payload = { user, data, time };
 
     const string = JSON.stringify(payload);
 
     localStorage.setItem(key, string);
-  } catch (error) {
-    throw error;
-  }
+  } catch (error) {}
 }
 
-function getClientCache<Data, Revert>(
-  key: ClientCacheKey,
+function get<Data, Revert>(
+  key: Keys,
   user: string,
   revert: Revert
-): Data | Revert {
+): Data | Revert | undefined {
   try {
     const secondsInHours = 3600;
 
@@ -48,7 +43,7 @@ function getClientCache<Data, Revert>(
       return revert;
     }
 
-    const payload: ClientCachePayload = JSON.parse(cache);
+    const payload: Payload = JSON.parse(cache);
 
     const isUserValid = user === payload.user;
 
@@ -67,14 +62,9 @@ function getClientCache<Data, Revert>(
     }
 
     return revert;
-  } catch (error) {
-    throw error;
-  }
+  } catch (error) {}
 }
 
-const clientCache = {
-  set: setClientCache,
-  get: getClientCache,
-};
+const clientCache = { set, get };
 
 export default clientCache;

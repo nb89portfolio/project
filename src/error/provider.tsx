@@ -8,8 +8,6 @@ import {
   useState,
 } from 'react';
 
-export type NextJSError = Error & { digest?: string };
-
 export type ErrorReport = {
   name: string;
   message: string;
