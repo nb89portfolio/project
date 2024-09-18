@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import UidContext from './cache';
+import UidContext from './context';
 import { UidState } from './types';
 import handleUidCache from './handle';
 

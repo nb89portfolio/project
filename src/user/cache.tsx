@@ -1,11 +1,16 @@
 'use client';
 
-import { createContext } from 'react';
-import { Uid } from './types';
+import { Dispatch, SetStateAction } from 'react';
+import getClientCache from '../cache/get';
+import { UidState } from './types';
 
-const UidContext = createContext<Uid>({
-  username: 'testing',
-  setUid: () => {},
-});
+export default function handleUidCache(
+  username: string,
+  setUid: Dispatch<SetStateAction<UidState>>
+) {
+  const data = getClientCache<UidState, UidState>('user', username, {
+    username: '',
+  });
 
-export default UidContext;
+  setUid(data);
+}
