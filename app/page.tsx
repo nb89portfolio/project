@@ -5,7 +5,7 @@ import styles from './page.module.css';
 
 export default function Home() {
   useEffect(() => {
-    throw new Error();
+    throw new Error('Testing');
   }, []);
 
   return (

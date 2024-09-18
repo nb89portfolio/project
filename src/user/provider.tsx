@@ -1,28 +1,16 @@
 'use client';
 
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useState,
-} from 'react';
-
-type UidState = {
-  username: string;
-};
-
-type Uid = UidState & {
-  setUid: Dispatch<SetStateAction<UidState>>;
-};
-
-export const UidContext = createContext<Uid>({
-  username: '',
-  setUid: () => {},
-});
+import { ReactNode, useEffect, useState } from 'react';
+import UidContext from './cache';
+import { UidState } from './types';
+import handleUidCache from './handle';
 
 export default function UidProvider({ children }: { children: ReactNode }) {
   const [uid, setUid] = useState<UidState>({ username: '' });
+
+  useEffect(() => {
+    handleUidCache(uid.username, setUid);
+  }, []);
 
   return (
     <UidContext.Provider value={{ ...uid, setUid }}>

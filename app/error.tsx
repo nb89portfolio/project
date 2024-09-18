@@ -4,31 +4,25 @@ import { ErrorRecordContext, ErrorReport } from '@/src/error/provider';
 import styles from './page.module.css';
 import { Dispatch, SetStateAction, useContext, useEffect } from 'react';
 import { UidContext } from '@/src/user/provider';
-import reportErrorRecord from '@/src/error/actions';
+import reportErrorRecord from '@/src/error/action';
 import clientCache from '@/src/cache/provider';
-import NextJSError from '@/src/error/class';
 
-function defineErrorReport(error: NextJSError | unknown): ErrorReport {
-  const isError = error instanceof NextJSError;
+export type NextJsError = Error & { digest?: string };
 
-  if (!isError) {
-    const name = 'Error name is undeifned.';
-    const message = 'Error message is undefined.';
-    const stack = 'Error stack is undefined.';
-    const digest = 'Error digest is undefined.';
-
-    return { name, message, stack, digest } as ErrorReport;
-  }
-
+function defineReport(error: NextJsError) {
   const { name, message } = error;
 
-  const hasStack = error.stack !== undefined;
+  const isStackDefined = error.stack !== undefined;
 
-  const stack = hasStack ? (error.stack as string) : 'Stack is undefined.';
+  const stack = isStackDefined
+    ? (error.stack as string)
+    : 'Stack is undefined.';
 
-  const hasDigest = (error.digest as keyof NextJSError) !== undefined;
+  const isDigestDefined = error.digest !== undefined;
 
-  const digest = hasDigest ? (error.digest as string) : 'Digest is undefined';
+  const digest = isDigestDefined
+    ? (error.digest as string)
+    : 'Digest is undefined.';
 
   return { name, message, stack, digest } as ErrorReport;
 }
@@ -50,14 +44,12 @@ function handleCache(username: string, records: ErrorReport[]): ErrorReport[] {
 }
 
 function handleError(
-  error: NextJSError,
+  report: ErrorReport,
   records: ErrorReport[],
   setRecords: Dispatch<SetStateAction<ErrorReport[]>>,
   setStatus: Dispatch<SetStateAction<string>>,
   username: string
 ) {
-  const report = defineErrorReport(error);
-
   const { name, message, stack, digest } = report;
 
   const usuableRecords = handleCache(username, records);
@@ -84,30 +76,39 @@ function handleError(
 
     reportErrorRecord(report, username)
       .then((response) => {
-        const data = response.data;
-
-        const isString = typeof data === 'string';
+        const isString = typeof response === 'string';
 
         if (isString) {
-          setStatus(data);
+          setStatus(response);
         } else {
           setStatus('Server failed to submit error report.');
 
-          const { name, message, stack, digest } = data;
-
-          const newError = new NextJSError(name, message, stack, digest);
-
-          handleError(newError, records, setRecords, setStatus, username);
+          handleError(response, records, setRecords, setStatus, username);
         }
       })
       .catch((error) => {
         setStatus('Client failed to submit error report.');
 
-        const { name, message, stack, digest } = defineErrorReport(error);
+        const isError =
+          error instanceof TypeError ||
+          error instanceof SyntaxError ||
+          error instanceof RangeError ||
+          error instanceof ReferenceError;
 
-        const newError = new NextJSError(name, message, stack, digest);
+        if (isError) {
+          const report = defineReport(error);
 
-        handleError(newError, records, setRecords, setStatus, username);
+          handleError(report, records, setRecords, setStatus, username);
+        }
+
+        const report: ErrorReport = {
+          name: 'Error name unknown.',
+          message: 'Error message unknown.',
+          stack: 'Error stack unknown.',
+          digest: 'Error digest unknown.',
+        };
+
+        handleError(report, records, setRecords, setStatus, username);
       });
   }
 }
@@ -116,7 +117,7 @@ export default function Error({
   error,
   reset,
 }: {
-  error: NextJSError;
+  error: NextJsError;
   reset: () => void;
 }) {
   const errorState = useContext(ErrorRecordContext);
@@ -127,8 +128,10 @@ export default function Error({
 
   const { username } = uid;
 
+  const report = defineReport(error);
+
   useEffect(() => {
-    handleError(error, records, setRecords, setStatus, username);
+    handleError(report, records, setRecords, setStatus, username);
   }, []);
 
   return (

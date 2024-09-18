@@ -1,6 +1,9 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,24 +13,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int    @id @unique @default(autoincrement())
-  email    String @unique
-  username String @unique
+model Users {
+  id             Int              @id @default(autoincrement())
+  username       String
+  errorInstances ErrorInstances[]
 }
 
-model ErrorRecord {
-  id      Int    @id @unique @default(autoincrement())
-  name    String
-  message String
-  stack   String
-  digest  String
+model ErrorRecords {
+  id             Int              @id @default(autoincrement())
+  name           String
+  message        String
+  stack          String
+  digest         String
+  errorInstances ErrorInstances[]
 }
 
 model ErrorInstances {
-  id            Int      @id @unique @default(autoincrement())
-  errorRecordId Int      @unique
-  userId        Int      @unique
-  created       DateTime
-  updated       DateTime
+  id             Int           @id @default(autoincrement())
+  created        DateTime
+  updated        DateTime
+  User           Users?        @relation(fields: [usersId], references: [id])
+  usersId        Int?
+  ErrorRecords   ErrorRecords? @relation(fields: [errorRecordsId], references: [id])
+  errorRecordsId Int?
 }
