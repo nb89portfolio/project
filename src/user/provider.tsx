@@ -1,31 +1,20 @@
 'use client';
 
-import {
-  ReactNode,
-  useState,
-  useEffect,
-  SetStateAction,
-  Dispatch,
-} from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import UidContext from './context';
 import { UidState } from './types';
-import handleContextCache from '../cache/context';
-
-function setUid(data: UidState, setState: Dispatch<SetStateAction<UidState>>) {
-  setClient;
-
-  setState(data);
-}
+import getClientCache from '../cache/get';
+import setClientCache from '../cache/set';
 
 export default function UidProvider({ children }: { children: ReactNode }) {
   const [uid, setUid] = useState<UidState>({ username: '' });
 
   useEffect(() => {
-    handleContextCache<UidState>('user', uid.username, uid, setUid);
+    getClientCache<UidState>('user', uid.username, { username: '' }, setUid);
   }, []);
 
   return (
-    <UidContext.Provider value={{ ...uid, setUid }}>
+    <UidContext.Provider value={{ ...uid, setUid, setState: setClientCache }}>
       {children}
     </UidContext.Provider>
   );

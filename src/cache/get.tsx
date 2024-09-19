@@ -1,38 +1,68 @@
 'use client';
 
-import { getCurrentHours } from './time';
+import { Dispatch, SetStateAction } from 'react';
+import { getCurrentHours } from './hours';
 import { ClientCacheKeys, ClientCacheData } from './types';
 
-export default function getClientCache<DataType>(
+function getLocalStorage(key: ClientCacheKeys) {
+  const data = localStorage.getItem(key);
+  const isValid = data !== null;
+  return { data, isValid };
+}
+
+function getData(cache: string, username: string) {
+  const data: ClientCacheData = JSON.parse(cache);
+
+  const isValid = username === data.user;
+
+  return { data, isValid };
+}
+
+function validateData(uploadedHours: number, hourLimt: number) {
+  const currentHours = getCurrentHours();
+
+  const differaceInHours = currentHours - uploadedHours;
+
+  const isValid = differaceInHours < hourLimt;
+
+  return isValid;
+}
+
+function processClientCache<DataType>(
   key: ClientCacheKeys,
-  user: string,
+  username: string,
   defaultData: DataType
 ): DataType {
-  const cache = localStorage.getItem(key);
+  const cache = getLocalStorage(key);
 
-  const isCacheNull = cache === null;
-
-  if (isCacheNull) {
+  if (!cache.isValid) {
     return defaultData;
   }
 
-  const payload: ClientCacheData = JSON.parse(cache);
+  const payload = getData(cache.data as string, username);
 
-  const isUserValid = user === payload.user;
-
-  if (!isUserValid) {
+  if (!payload.isValid) {
     return defaultData;
   }
 
-  const updatedHours = getCurrentHours();
+  const { time } = payload.data;
 
-  const differaceInHours = updatedHours - payload.time.current;
+  const isValid = validateData(time.current, time.limit);
 
-  const isValidDifference = differaceInHours < payload.time.limit;
-
-  if (isValidDifference) {
+  if (isValid) {
     return payload.data as DataType;
   }
 
-  return defaultData;
+  return defaultData as DataType;
+}
+
+export default function getClientCache<DataType>(
+  key: ClientCacheKeys,
+  username: string,
+  defaultData: DataType,
+  setState: Dispatch<SetStateAction<DataType>>
+) {
+  const data = processClientCache<DataType>(key, username, defaultData);
+
+  setState(data);
 }
