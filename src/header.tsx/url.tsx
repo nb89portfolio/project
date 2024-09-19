@@ -1,33 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-
-function getCapatalizedStrings(strings: String[]) {
-  const recapatalizedStrings = strings.map((word) => {
-    const firstChararacter = word.charAt(0);
-    const capatalizedCharacter = firstChararacter.toUpperCase();
-    const otherCharacters = word.slice(1);
-    const string = capatalizedCharacter + otherCharacters;
-
-    return string;
-  });
-
-  return recapatalizedStrings;
-}
-
-function getText(pathname: string) {
-  const removedSlash = pathname.replaceAll('/', ' ');
-  const lowercase = removedSlash.toLowerCase();
-  const splitStrings = lowercase.split(' ');
-  const recapatalizedStrings = getCapatalizedStrings(splitStrings);
-  const builtUrl = recapatalizedStrings.join(' ');
-
-  const isEmpty = builtUrl === ' ';
-
-  const url = isEmpty ? 'Home' : builtUrl;
-
-  return url;
-}
+import getText from './text';
 
 export default function HeaderUrl() {
   const pathname = usePathname();

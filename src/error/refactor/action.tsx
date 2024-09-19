@@ -1,7 +1,6 @@
 'use server';
 
 import prisma from '@/prisma/provider';
-import { ErrorReport } from './provider';
 import { NextJsError } from '@/app/error';
 
 function defineReport(error: NextJsError) {
@@ -78,7 +77,7 @@ export default async function reportErrorRecord(
           updated: new Date(),
           errorRecordsId: createdRecord.id,
           usersId: user.id,
-          User: {  },
+          User: {},
         },
       });
     }

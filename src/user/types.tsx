@@ -1,9 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 
-export type UidState = {
+type UidState = {
   username: string;
 };
 
-export type Uid = UidState & {
+type Uid = UidState & {
   setUid: Dispatch<SetStateAction<UidState>>;
 };
+
+export type { UidState, Uid };

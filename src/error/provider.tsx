@@ -1,33 +1,10 @@
 'use client';
 
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useState,
-} from 'react';
-
-export type ErrorReport = {
-  name: string;
-  message: string;
-  stack: string;
-  digest: string;
-};
-
-type ErrorRecord = {
-  records: ErrorReport[];
-  setRecords: Dispatch<SetStateAction<ErrorReport[]>>;
-  status: string;
-  setStatus: Dispatch<SetStateAction<string>>;
-};
-
-export const ErrorRecordContext = createContext<ErrorRecord>({
-  records: [],
-  setRecords: () => {},
-  status: '',
-  setStatus: () => {},
-});
+import { ReactNode, useEffect, useState } from 'react';
+import ErrorRecordContext from './context';
+import { ErrorReport } from './types';
+import handleErrorCache from './handleCache';
+import UseUidContext from '../user/use';
 
 export default function ErrorRecordProvider({
   children,
@@ -37,6 +14,12 @@ export default function ErrorRecordProvider({
   const [records, setRecords] = useState<ErrorReport[]>([]);
 
   const [status, setStatus] = useState<string>('');
+
+  const uid = UseUidContext();
+
+  useEffect(() => {
+    handleErrorCache(uid.username, setRecords);
+  }, []);
 
   return (
     <ErrorRecordContext.Provider
