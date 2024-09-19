@@ -3,11 +3,11 @@
 import { getCurrentHours } from './time';
 import { ClientCacheKeys, ClientCacheData } from './types';
 
-export default function getClientCache<DataType, DefaultData>(
+export default function getClientCache<DataType>(
   key: ClientCacheKeys,
   user: string,
-  defaultData: DefaultData
-): DataType | DefaultData {
+  defaultData: DataType
+): DataType {
   const cache = localStorage.getItem(key);
 
   const isCacheNull = cache === null;

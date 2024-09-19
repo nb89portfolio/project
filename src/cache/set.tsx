@@ -3,7 +3,7 @@
 import { getCurrentHours } from './time';
 import { ClientCacheKeys, ClientCacheData } from './types';
 
-function setClientCache<DataType>(
+export default function setClientCache<DataType>(
   key: ClientCacheKeys,
   user: string,
   data: DataType,
