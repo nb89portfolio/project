@@ -24,5 +24,7 @@ export default function NavigationButton({
 }) {
   const router = useRouter();
 
-  return <button onClick={() => navigateTo(route, router)}>{}</button>;
+  const text = route.charAt(0).toUpperCase + route.slice(1);
+
+  return <button onClick={() => navigateTo(route, router)}>{text}</button>;
 }
