@@ -1,12 +1,20 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import getText from './text';
 
-export default function HeaderUrl() {
+function HeaderUrl() {
   const pathname = usePathname();
 
-  const url = getText(pathname);
+  const url = pathname
+    .replaceAll('/', ' ')
+    .toLowerCase()
+    .split(' ')
+    .map((element) => {
+      return element.charAt(0).toUpperCase() + element.slice(1);
+    })
+    .join(' ');
 
   return <h1>{url}</h1>;
 }
+
+export default HeaderUrl;

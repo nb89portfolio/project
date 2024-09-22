@@ -17,14 +17,12 @@ function navigateTo(route: NavigationRoute, router: AppRouterInstance) {
   }
 }
 
-export default function NavigationButton({
-  route,
-}: {
-  route: NavigationRoute;
-}) {
+function NavigationButton({ route }: { route: NavigationRoute }) {
   const router = useRouter();
 
   const text = route.charAt(0).toUpperCase + route.slice(1);
 
   return <button onClick={() => navigateTo(route, router)}>{text}</button>;
 }
+
+export default NavigationButton;
