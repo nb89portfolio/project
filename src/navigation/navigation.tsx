@@ -1,9 +1,21 @@
 'use client';
 
-import { Route as NavigationRoute } from 'next';
 import { useRouter } from 'next/navigation';
+import { NavigationRoute } from './types';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-function navigateTo(route: NavigationRoute, route) {}
+function navigateTo(route: NavigationRoute, router: AppRouterInstance) {
+  switch (route) {
+    case 'back':
+      router.back();
+    case 'refresh':
+      router.refresh();
+    case 'home':
+      router.push('/');
+    default:
+      router.push('/');
+  }
+}
 
 export default function NavigationButton({
   route,
