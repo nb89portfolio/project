@@ -6,7 +6,7 @@ import { UidState } from './types';
 import getClientCache from '../cache/get';
 import setClientCache from '../cache/set';
 
-export default function UidProvider({ children }: { children: ReactNode }) {
+function UidProvider({ children }: { children: ReactNode }) {
   const [uid, setUid] = useState<UidState>({ username: '' });
 
   useEffect(() => {
@@ -19,3 +19,5 @@ export default function UidProvider({ children }: { children: ReactNode }) {
     </UidContext.Provider>
   );
 }
+
+export default UidProvider;

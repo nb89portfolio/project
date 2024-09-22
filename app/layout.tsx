@@ -5,6 +5,8 @@ import LoadingProvider from '@/src/loading/suspense';
 import HeaderProvider from '@/src/header.tsx/provider';
 import ErrorRecordProvider from '@/src/error/provider';
 import UidProvider from '@/src/user/provider';
+import ContextWrapper from '@/src/context/wip';
+import contextWrapper from '@/src/context/wip';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,13 +23,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <UidProvider>
-          <HeaderProvider></HeaderProvider>
-          <ErrorRecordProvider>
-            <LoadingProvider>{children}</LoadingProvider>
-          </ErrorRecordProvider>
-          <footer>Test footer</footer>
-        </UidProvider>
+        <HeaderProvider></HeaderProvider>
+
+        <LoadingProvider>{children}</LoadingProvider>
+
+        <footer>Test footer</footer>
       </body>
     </html>
   );

@@ -3,8 +3,10 @@
 import { useContext } from 'react';
 import UidContext from './context';
 
-export function UseUidContext() {
+function UseUidContext() {
   const uid = useContext(UidContext);
 
   return uid;
 }
+
+export default UseUidContext;

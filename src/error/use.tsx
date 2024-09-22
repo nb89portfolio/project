@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
 import { useContext, useEffect } from 'react';
 import ErrorRecordContext from './context';
 import handleError from './handleError';
 
-
+/*
 function defineReport(error: NextJsError) {
   const { name, message } = error;
 
@@ -119,4 +119,4 @@ export default function UseErrorContext({ error }: {error: }) {
     },[])
     
   return <output>{errorStatus.status}</output>;
-}
+}*/
