@@ -3,11 +3,9 @@
 import { createContext } from 'react';
 import { ErrorRecord } from './types';
 
-const ErrorRecordContext = createContext<ErrorRecord>({
+const ErrorContext = createContext<ErrorRecord>({
   records: [],
   setRecords: () => {},
-  status: '',
-  setStatus: () => {},
 });
 
-export default ErrorRecordContext;
+export default ErrorContext;

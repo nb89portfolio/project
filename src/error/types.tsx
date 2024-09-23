@@ -1,17 +1,17 @@
 import { Dispatch, SetStateAction } from 'react';
 
-export type ErrorReport = {
+type ErrorReport = {
   name: string;
   message: string;
   stack: string;
   digest: string;
 };
 
-export type ErrorRecord = {
+type ErrorRecord = {
   records: ErrorReport[];
-  setRecords: Dispatch<SetStateAction<ErrorReport[]>>;
-  status: string;
-  setStatus: Dispatch<SetStateAction<string>>;
+  setRecords: (data: ErrorReport[], username: string) => void;
 };
 
-export type NextJsError = Error & { digest?: string };
+type NextJsError = Error & { digest?: string };
+
+export type { ErrorReport, ErrorRecord, NextJsError };

@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import LoadingProvider from '@/src/loading/suspense';
 import Header from '@/src/header.tsx/component';
-import ErrorRecordProvider from '@/src/error/provider';
+import ErrorProvider from '@/src/error/refactor/provider';
 import UidProvider from '@/src/user/provider';
 import ContextWrapper from '@/src/context/wip';
 import contextWrapper from '@/src/context/wip';

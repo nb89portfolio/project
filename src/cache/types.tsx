@@ -1,10 +1,12 @@
-export type ClientCacheKeys = 'error' | 'user';
+type ClientCacheKeys = 'error' | 'user';
 
-export type ClientCacheData = {
-  user: string;
-  data: any;
-  time: {
-    limit: number;
-    current: number;
+type ClientCacheData<Data> = {
+  username: string;
+  data: Data;
+  ttl: {
+    hourlyLimit: number;
+    initialHours: number;
   };
 };
+
+export type { ClientCacheKeys, ClientCacheData };

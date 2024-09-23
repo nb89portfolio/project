@@ -1,30 +1,49 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
-import ErrorRecordContext from './context';
-import { ErrorReport } from './types';
-import handleErrorCache from './handleCache';
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
+
+import getClientCache from '@/src/cache/get';
+import setClientCache from '@/src/cache/set';
 import UseUidContext from '../user/use';
+import ErrorContext from './context';
+import { ErrorReport } from './types';
 
-export default function ErrorRecordProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+function getCachedData(
+  username: string,
+  currentData: ErrorReport[],
+  setState: Dispatch<SetStateAction<ErrorReport[]>>
+) {
+  const data = getClientCache<ErrorReport[]>('error', username, currentData);
+
+  setState(data);
+}
+
+function ErrorProvider({ children }: { children: ReactNode }) {
+  function setCachedData(data: ErrorReport[], username: string) {
+    setClientCache<ErrorReport[]>('error', username, data, 24);
+
+    setRecords(data);
+  }
+
   const [records, setRecords] = useState<ErrorReport[]>([]);
-
-  const [status, setStatus] = useState<string>('');
 
   const uid = UseUidContext();
 
   useEffect(() => {
-    handleErrorCache(uid.username, setRecords);
+    getCachedData(uid.username, records, setRecords);
   }, []);
 
   return (
-    <ErrorRecordContext.Provider
-      value={{ records, setRecords, status, setStatus }}>
+    <ErrorContext.Provider value={{ records, setRecords: setCachedData }}>
       {children}
-    </ErrorRecordContext.Provider>
+    </ErrorContext.Provider>
   );
 }
+
+export default ErrorProvider;

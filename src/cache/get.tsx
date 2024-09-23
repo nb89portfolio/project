@@ -1,68 +1,44 @@
 'use client';
 
-import { Dispatch, SetStateAction } from 'react';
-import { getCurrentHours } from './hours';
+import getCurrentHours from './hours';
 import { ClientCacheKeys, ClientCacheData } from './types';
 
-function getLocalStorage(key: ClientCacheKeys) {
-  const data = localStorage.getItem(key);
-  const isValid = data !== null;
-  return { data, isValid };
-}
+function getClientCache<DataType>(
+  key: ClientCacheKeys,
+  username: string,
+  currentData: DataType
+): DataType {
+  const localStorageData = localStorage.getItem(key);
 
-function getData(cache: string, username: string) {
-  const data: ClientCacheData = JSON.parse(cache);
+  const isValidData = localStorageData !== null;
 
-  const isValid = username === data.user;
+  if (!isValidData) {
+    return currentData;
+  }
 
-  return { data, isValid };
-}
+  const parsedData: ClientCacheData<DataType> = JSON.parse(
+    localStorageData as string
+  );
 
-function validateData(uploadedHours: number, hourLimt: number) {
+  const isValidUser = username === parsedData.username;
+
+  if (isValidUser) {
+    return currentData;
+  }
+
+  const { hourlyLimit, initialHours } = parsedData.ttl;
+
   const currentHours = getCurrentHours();
 
-  const differaceInHours = currentHours - uploadedHours;
+  const hourlyDifferential = currentHours - initialHours;
 
-  const isValid = differaceInHours < hourLimt;
+  const isValidTtl = hourlyDifferential <= hourlyLimit;
 
-  return isValid;
-}
-
-function processClientCache<DataType>(
-  key: ClientCacheKeys,
-  username: string,
-  defaultData: DataType
-): DataType {
-  const cache = getLocalStorage(key);
-
-  if (!cache.isValid) {
-    return defaultData;
+  if (!isValidTtl) {
+    return currentData;
   }
 
-  const payload = getData(cache.data as string, username);
-
-  if (!payload.isValid) {
-    return defaultData;
-  }
-
-  const { time } = payload.data;
-
-  const isValid = validateData(time.current, time.limit);
-
-  if (isValid) {
-    return payload.data as DataType;
-  }
-
-  return defaultData as DataType;
+  return parsedData.data as DataType;
 }
 
-export default function getClientCache<DataType>(
-  key: ClientCacheKeys,
-  username: string,
-  defaultData: DataType,
-  setState: Dispatch<SetStateAction<DataType>>
-) {
-  const data = processClientCache<DataType>(key, username, defaultData);
-
-  setState(data);
-}
+export default getClientCache;
