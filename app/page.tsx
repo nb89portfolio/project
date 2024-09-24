@@ -11,6 +11,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <p>This is the home page.</p>
+      <p>Testing merge conflicts.</p>
     </main>
   );
 }
