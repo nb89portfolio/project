@@ -2,9 +2,8 @@ import { createContext } from 'react';
 import { Uid } from './types';
 
 const UidContext = createContext<Uid>({
-  username: 'testing',
+  username: '',
   setUid: () => {},
-  setState: () => {},
 });
 
 export default UidContext;

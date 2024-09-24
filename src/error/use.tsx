@@ -9,10 +9,12 @@ import {
 } from 'react';
 import ErrorContext from './context';
 import { ErrorRecord, ErrorReport, NextJsError } from './types';
-import reportErrorRecord from './refactor/action';
+import reportErrorRecord from './action';
 import { RebuiltError } from './classes';
 import defineReport from './define';
 import UseUidContext from '../user/use';
+import getClientCache from '@/src/cache/get';
+import setClientCache from '@/src/cache/set';
 
 function handleError(
   error: NextJsError,
@@ -20,9 +22,17 @@ function handleError(
   setStatus: Dispatch<SetStateAction<string>>,
   username: string
 ) {
+  const records = getClientCache<ErrorReport[]>(
+    'error',
+    username,
+    errors.records
+  );
+
+  console.log('old', errors.records, 'new', records);
+
   const report = defineReport(error);
 
-  const { records, setRecords } = errors;
+  const { setRecords } = errors;
 
   const foundDuplicates = records.find((record) => {
     return (
@@ -33,12 +43,16 @@ function handleError(
     );
   });
 
-  const hasNoDuplicate = foundDuplicates === null;
+  const hasNoDuplicates = foundDuplicates === undefined;
 
-  if (hasNoDuplicate) {
-    setRecords([...records, report], username);
+  if (hasNoDuplicates) {
+    const newRecords = [...records, report];
 
-    reportErrorRecord(report)
+    setClientCache<ErrorReport[]>('error', username, newRecords, 24);
+
+    setRecords(newRecords);
+
+    reportErrorRecord(report, username)
       .then((response) => {
         const isString = typeof response === 'string';
 
@@ -77,7 +91,7 @@ export default function UseErrorContext({ error }: { error: NextJsError }) {
 
   useEffect(() => {
     handleError(error, errors, setStatus, uid.username);
-  }, []);
+  });
 
   return <output>{state}</output>;
 }

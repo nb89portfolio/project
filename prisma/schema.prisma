@@ -19,6 +19,16 @@ model Users {
   errorInstances ErrorInstances[]
 }
 
+model ErrorInstances {
+  id             Int          @id @default(autoincrement())
+  intial         DateTime
+  updated        DateTime
+  Users          Users        @relation(fields: [usersId], references: [id])
+  usersId        Int
+  ErrorRecords   ErrorRecords @relation(fields: [errorRecordsId], references: [id])
+  errorRecordsId Int
+}
+
 model ErrorRecords {
   id             Int              @id @default(autoincrement())
   name           String
@@ -26,14 +36,4 @@ model ErrorRecords {
   stack          String
   digest         String
   errorInstances ErrorInstances[]
-}
-
-model ErrorInstances {
-  id             Int           @id @default(autoincrement())
-  created        DateTime
-  updated        DateTime
-  User           Users?        @relation(fields: [usersId], references: [id])
-  usersId        Int?
-  ErrorRecords   ErrorRecords? @relation(fields: [errorRecordsId], references: [id])
-  errorRecordsId Int?
 }

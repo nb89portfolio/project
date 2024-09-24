@@ -3,10 +3,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import LoadingProvider from '@/src/loading/suspense';
 import Header from '@/src/header.tsx/component';
-import ErrorProvider from '@/src/error/refactor/provider';
-import UidProvider from '@/src/user/provider';
-import ContextWrapper from '@/src/context/wip';
-import contextWrapper from '@/src/context/wip';
+import UidContextProvider from '@/src/user/provider';
+import ErrorContextProvider from '@/src/error/provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,11 +21,13 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <Header></Header>
-
-        <LoadingProvider>{children}</LoadingProvider>
-
-        <footer>Test footer</footer>
+        <UidContextProvider>
+          <ErrorContextProvider>
+            <Header></Header>
+            <LoadingProvider>{children}</LoadingProvider>
+          </ErrorContextProvider>
+          <footer>Test footer</footer>
+        </UidContextProvider>
       </body>
     </html>
   );

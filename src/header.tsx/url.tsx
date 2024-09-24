@@ -14,7 +14,11 @@ function HeaderUrl() {
     })
     .join(' ');
 
-  return <h1>{url}</h1>;
+  const isHomeUrl = url === ' ';
+
+  const text = isHomeUrl ? 'Home' : url;
+
+  return <h1>{text}</h1>;
 }
 
 export default HeaderUrl;

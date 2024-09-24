@@ -9,7 +9,7 @@ type ErrorReport = {
 
 type ErrorRecord = {
   records: ErrorReport[];
-  setRecords: (data: ErrorReport[], username: string) => void;
+  setRecords: Dispatch<SetStateAction<ErrorReport[]>>;
 };
 
 type NextJsError = Error & { digest?: string };

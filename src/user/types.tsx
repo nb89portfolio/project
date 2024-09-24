@@ -6,7 +6,6 @@ type UidState = {
 
 type Uid = UidState & {
   setUid: Dispatch<SetStateAction<UidState>>;
-  setState: (data: UidState, username: string) => void;
 };
 
 export type { UidState, Uid };
