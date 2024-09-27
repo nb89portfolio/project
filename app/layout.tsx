@@ -5,6 +5,7 @@ import LoadingProvider from '@/src/loading/suspense';
 import Header from '@/src/header.tsx/component';
 import UidContextProvider from '@/src/user/provider';
 import ErrorContextProvider from '@/src/error/provider';
+import ContextInstance from '@/src/context/create';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,13 +22,15 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <UidContextProvider>
-          <ErrorContextProvider>
-            <Header></Header>
-            <LoadingProvider>{children}</LoadingProvider>
-          </ErrorContextProvider>
-          <footer>Test footer</footer>
-        </UidContextProvider>
+        <Test2>
+          <UidContextProvider>
+            <ErrorContextProvider>
+              <Header></Header>
+              <LoadingProvider>{children}</LoadingProvider>
+            </ErrorContextProvider>
+            <footer>Test footer</footer>
+          </UidContextProvider>
+        </Test2>
       </body>
     </html>
   );
