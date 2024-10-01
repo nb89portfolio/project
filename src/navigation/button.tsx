@@ -1,8 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { NavigationRoute } from './types';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+
+type NavigationRoute = 'home' | 'back' | 'refresh';
 
 function navigateTo(route: NavigationRoute, router: AppRouterInstance) {
   switch (route) {
@@ -17,12 +18,10 @@ function navigateTo(route: NavigationRoute, router: AppRouterInstance) {
   }
 }
 
-function NavigationButton({ route }: { route: NavigationRoute }) {
+export function NavigationButton({ route }: { route: NavigationRoute }) {
   const router = useRouter();
 
   const text = route.charAt(0).toUpperCase + route.slice(1);
 
   return <button onClick={() => navigateTo(route, router)}>{text}</button>;
 }
-
-export default NavigationButton;

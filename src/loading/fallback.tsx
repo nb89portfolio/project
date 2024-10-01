@@ -1,7 +1,7 @@
 import styles from '../../app/page.module.css';
-import NavigationButton from '../navigation/navigation';
+import { NavigationButton } from '../navigation/button';
 
-function LoadingFallback() {
+export function LoadingFallback() {
   return (
     <main className={styles.main}>
       <h2>Page Loading</h2>
@@ -14,5 +14,3 @@ function LoadingFallback() {
     </main>
   );
 }
-
-export default LoadingFallback;

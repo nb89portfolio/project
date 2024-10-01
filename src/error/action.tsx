@@ -2,10 +2,9 @@
 
 import prisma from '@/prisma/instance';
 import { ErrorInstances } from '@prisma/client';
-import defineReport from './define';
-import { ErrorReport } from './types';
+import { ErrorReport } from './context';
 
-async function reportError(report: ErrorReport, username: string) {
+export async function reportError(report: ErrorReport, username: string) {
   try {
     const foundUser = await prisma.users.findFirst({ where: { username } });
 
@@ -93,9 +92,17 @@ async function reportError(report: ErrorReport, username: string) {
     const isError = error instanceof Error;
 
     if (isError) {
-      const report = defineReport(error);
+      const { name, message } = error;
 
-      return report as ErrorReport;
+      const isStackDefined = error.stack !== undefined;
+
+      const stack = isStackDefined
+        ? (error.stack as string)
+        : 'Stack is not defined.';
+
+      const digest = 'Digest does not exist';
+
+      return { name, message, stack, digest } as ErrorReport;
     } else {
       return {
         name: 'Error name is unknown.',
@@ -106,5 +113,3 @@ async function reportError(report: ErrorReport, username: string) {
     }
   }
 }
-
-export default reportError;

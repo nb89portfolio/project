@@ -1,12 +1,10 @@
 import styles from './header.module.css';
-import HeaderUrl from './url';
+import { HeaderUrl } from './url';
 
-function Header({}: {}) {
+export function Header({}: {}) {
   return (
     <header className={styles.header}>
       <HeaderUrl></HeaderUrl>
     </header>
   );
 }
-
-export default Header;
