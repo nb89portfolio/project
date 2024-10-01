@@ -1,7 +1,8 @@
-class RebuiltError extends Error {
-  name = '';
-  stack = '';
-  digest = '';
+export class RebuildError extends Error {
+  name: string;
+  message: string;
+  stack: string;
+  digest: string;
 
   constructor(name: string, message: string, stack: string, digest: string) {
     super(message);
@@ -11,8 +12,6 @@ class RebuiltError extends Error {
     this.stack = stack;
     this.digest = digest;
 
-    Object.setPrototypeOf(this, RebuiltError.prototype);
+    Object.setPrototypeOf(this, RebuildError.prototype);
   }
 }
-
-export { RebuiltError };

@@ -1,4 +1,4 @@
-import NavigationButton from '@/src/navigation/navigation';
+import { NavigationButton } from '@/src/navigation/button';
 import styles from './page.module.css';
 
 export default function NotFound() {

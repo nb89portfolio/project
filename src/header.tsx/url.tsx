@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
-function HeaderUrl() {
+export function HeaderUrl() {
   const pathname = usePathname();
 
   const url = pathname
@@ -20,5 +20,3 @@ function HeaderUrl() {
 
   return <h1>{text}</h1>;
 }
-
-export default HeaderUrl;

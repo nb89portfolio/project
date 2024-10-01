@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import LoadingProvider from '@/src/loading/suspense';
-import Header from '@/src/header.tsx/component';
-import UidContextProvider from '@/src/user/provider';
-import ErrorContextProvider from '@/src/error/provider';
-import ContextInstance from '@/src/context/create';
+import { UidContextProvider } from '@/src/user/context';
+import { Header } from '@/src/header.tsx/header';
+import { LoadingProvider } from '@/src/loading/suspense';
+import { ErrorRecordContextProvider } from '@/src/error/context';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,15 +21,13 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <Test2>
-          <UidContextProvider>
-            <ErrorContextProvider>
-              <Header></Header>
-              <LoadingProvider>{children}</LoadingProvider>
-            </ErrorContextProvider>
-            <footer>Test footer</footer>
-          </UidContextProvider>
-        </Test2>
+        <UidContextProvider>
+          <ErrorRecordContextProvider>
+            <Header></Header>
+            <LoadingProvider>{children}</LoadingProvider>
+          </ErrorRecordContextProvider>
+        </UidContextProvider>
+        <footer>Test footer</footer>
       </body>
     </html>
   );
