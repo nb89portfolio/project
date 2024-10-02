@@ -36,11 +36,7 @@ function getCachedState() {
 
   const isValid = cache !== null;
 
-  if (isValid) {
-    return cache;
-  } else {
-    return initializeState;
-  }
+  return isValid ? cache : initializeState;
 }
 
 function setCachedState(
