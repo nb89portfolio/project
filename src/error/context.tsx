@@ -17,7 +17,7 @@ type ErrorRecordsAction = {
   setRecords: (data: ErrorRecordsState) => void;
 };
 
-type ErrorRecords = {
+export type ErrorRecords = {
   state: ErrorRecordsState;
   actions: ErrorRecordsAction;
 };
