@@ -10,63 +10,64 @@ import {
 } from 'react';
 import { getLocalStorage, setLocalStorage } from '../cache/localstorage';
 
-type UidState = {
+type State = {
   username: string;
 };
 
-type UidActions = {
-  setUid: (data: UidState) => void;
+type Actions = {
+  setUid: (data: State) => void;
 };
 
-type Uid = {
-  state: UidState;
-  actions: UidActions;
-};
+type UidContext = State & Actions;
 
-const initializeState: UidState = {
+const initializeState: State = {
   username: '',
 };
 
-const initializeUid: Uid = {
-  state: initializeState,
-  actions: {
-    setUid: () => {},
-  },
+const initializeContext: UidContext = {
+  ...initializeState,
+  setUid: (data) => {},
 };
 
-export const UidContext = createContext<Uid>(initializeUid);
+const Context = createContext<State & Actions>(initializeContext);
+
+function getCachedState() {
+  const cache = getLocalStorage<State>('', 'user');
+
+  const isValid = cache !== null;
+
+  if (isValid) {
+    return cache;
+  } else {
+    return initializeState;
+  }
+}
+
+function setCachedState(
+  data: State,
+  username: string,
+  setState: Dispatch<SetStateAction<State>>
+) {
+  setLocalStorage<State>(username, 'user', data, 1);
+  setState(data);
+}
 
 export function UidContextProvider({ children }: { children: ReactNode }) {
-  const [uid, setUid] = useState<UidState>(() => {
-    const cache = getLocalStorage<UidState>('', 'user');
-
-    const isValid = cache !== null;
-
-    if (isValid) {
-      return cache;
-    } else {
-      return initializeState;
-    }
-  });
+  const [state, setState] = useState<State>(getCachedState());
 
   return (
-    <UidContext.Provider
+    <Context.Provider
       value={{
-        state: uid,
-        actions: {
-          setUid: (data: UidState) => {
-            setLocalStorage<UidState>(uid.username, 'user', data, 1);
-            setUid(data);
-          },
-        },
+        ...state,
+        setUid: (data) => setCachedState(data, state.username, setState),
       }}>
       {children}
-    </UidContext.Provider>
+    </Context.Provider>
   );
 }
 
 export function UseUidContext() {
-  const uid = useContext(UidContext);
+  const uid = useContext(Context);
 
   return uid;
 }
