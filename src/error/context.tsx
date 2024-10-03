@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useState,
+} from 'react';
 import { getLocalStorage, setLocalStorage } from '../cache/localstorage';
 import { UseUidContext } from '../user/context';
 
@@ -11,73 +18,58 @@ export type ErrorReport = {
   digest: string;
 };
 
-type ErrorRecordsState = { records: ErrorReport[] };
+type State = { records: ErrorReport[] };
 
-type ErrorRecordsAction = {
-  setRecords: (data: ErrorRecordsState) => void;
+type Actions = {
+  setRecords: (data: State) => void;
 };
 
-export type ErrorRecords = {
-  state: ErrorRecordsState;
-  actions: ErrorRecordsAction;
+type ErrorContext = State & Actions;
+
+const initializeState: State = { records: [] };
+
+const initializeErrorRecord: ErrorContext = {
+  ...initializeState,
+  setRecords: (data) => {},
 };
 
-const initializeState = { records: [] };
+const Context = createContext<ErrorContext>(initializeErrorRecord);
 
-const initializeErrorRecord = {
-  state: initializeState,
-  actions: {
-    setRecords: () => {},
-  },
-};
+function getCachedState(username: string) {
+  const cache = getLocalStorage<State>(username, 'user');
 
-export const ErrorContext = createContext<ErrorRecords>(initializeErrorRecord);
+  const isValid = cache !== null;
 
-export function ErrorRecordContextProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+  return isValid ? cache : initializeState;
+}
+
+function setCachedState(
+  data: State,
+  username: string,
+  setState: Dispatch<SetStateAction<State>>
+) {
+  setLocalStorage<State>(username, 'user', data, 24);
+  setState(data);
+}
+
+export function ErrorContextProvider({ children }: { children: ReactNode }) {
   const uid = UseUidContext();
 
-  const [records, setRecords] = useState<ErrorRecordsState>(() => {
-    const cache = getLocalStorage<ErrorRecordsState>(
-      uid.state.username,
-      'error'
-    );
-
-    const isNotNull = cache !== null;
-
-    if (isNotNull) {
-      return cache;
-    } else {
-      return initializeState;
-    }
-  });
+  const [state, setState] = useState<State>(getCachedState(uid.username));
 
   return (
-    <ErrorContext.Provider
+    <Context.Provider
       value={{
-        state: records,
-        actions: {
-          setRecords: (data) => {
-            setLocalStorage<ErrorRecordsState>(
-              uid.state.username,
-              'error',
-              data,
-              24
-            );
-            setRecords(data);
-          },
-        },
+        ...state,
+        setRecords: (data) => setCachedState(data, uid.username, setState),
       }}>
       {children}
-    </ErrorContext.Provider>
+    </Context.Provider>
   );
 }
 
-export function UseErrorRecordContext() {
-  const context = useContext(ErrorContext);
+export function UseErrorContext() {
+  const context = useContext(Context);
 
   return context;
 }
