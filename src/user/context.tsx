@@ -34,6 +34,8 @@ const Context = createContext<State & Actions>(initializeContext);
 function getCachedState() {
   const cache = getLocalStorage<State>('', 'user');
 
+  console.log(cache, 'This is in user context for testing later');
+
   const isValid = cache !== null;
 
   return isValid ? cache : initializeState;

@@ -4,7 +4,7 @@ import './globals.css';
 import { UidContextProvider } from '@/src/user/context';
 import { Header } from '@/src/header.tsx/header';
 import { LoadingProvider } from '@/src/loading/suspense';
-import { ErrorRecordContextProvider } from '@/src/error/context';
+import { ErrorContextProvider } from '@/src/error/context';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,10 +22,10 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.className}>
         <UidContextProvider>
-          <ErrorRecordContextProvider>
+          <ErrorContextProvider>
             <Header></Header>
             <LoadingProvider>{children}</LoadingProvider>
-          </ErrorRecordContextProvider>
+          </ErrorContextProvider>
         </UidContextProvider>
         <footer>Test footer</footer>
       </body>

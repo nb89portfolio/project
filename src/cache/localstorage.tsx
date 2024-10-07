@@ -20,11 +20,6 @@ export function setLocalStorage<Type>(
 
   const setHourlyTime = new Date().getHours();
 
-  const ttl = {
-    hourlyLimit,
-    setHourlyTime,
-  };
-
   const payloadData: Payload<Type> = {
     data,
     ttl: {

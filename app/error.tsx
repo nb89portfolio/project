@@ -2,32 +2,12 @@
 
 import { UseUidContext } from '@/src/user/context';
 import styles from './page.module.css';
-import {
-  ErrorRecords,
-  ErrorReport,
-  UseErrorRecordContext,
-} from '@/src/error/context';
+import { ErrorReport, UseErrorContext } from '@/src/error/context';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { reportError } from '@/src/error/action';
-import { RebuildError } from '@/src/error/class';
+import { defineErrorReport, rebuildError } from '@/src/error/handler';
 
-type NextJsError = Error & { digest?: string };
-
-function buildReport(error: NextJsError) {
-  const { name, message } = error;
-
-  const isStackDefined = error.stack !== undefined;
-
-  const stack = isStackDefined ? (error.stack as string) : 'Stack is undefined';
-
-  const isDigestDefined = error.digest !== undefined;
-
-  const digest = isDigestDefined
-    ? (error.digest as string)
-    : 'Digest is undefined.';
-
-  return { name, message, stack, digest } as ErrorReport;
-}
+export type NextJsError = Error & { digest?: string };
 
 function findDuplicate(report: ErrorReport, records: ErrorReport[]) {
   return records.find((record) => {
@@ -49,32 +29,25 @@ function validateError(variable: any): variable is Error {
   );
 }
 
-function throwRebuiltError(report: ErrorReport) {
-  const { name, message, stack, digest } = report;
-
-  const rebuiltError = new RebuildError(name, message, stack, digest);
-
-  throw rebuiltError;
-}
-
 function handleError(
   username: string,
   error: NextJsError,
-  errorRecords: ErrorRecords,
+  errorRecords: ErrorReport[],
+  setRecords: (data: { records: ErrorReport[] }) => void,
   setStatus: Dispatch<SetStateAction<string>>
 ) {
-  const report = buildReport(error);
+  const report = defineErrorReport(error);
 
-  const hasDuplicateReport = findDuplicate(report, errorRecords.state.records);
+  const hasDuplicateReport = findDuplicate(report, errorRecords);
 
   const isDuplicateReport = hasDuplicateReport !== undefined;
 
   if (isDuplicateReport) {
     setStatus('Error has already been reported');
   } else {
-    const data = { records: [...errorRecords.state.records, report] };
+    const data = { records: [...errorRecords, report] };
 
-    errorRecords.actions.setRecords(data);
+    setRecords(data);
 
     reportError(report, username)
       .then((response) => {
@@ -83,7 +56,9 @@ function handleError(
         if (isString) {
           setStatus(response);
         } else {
-          throwRebuiltError(response);
+          const newError = rebuildError(response);
+
+          throw newError;
         }
       })
       .catch((error) => {
@@ -99,7 +74,9 @@ function handleError(
             digest: 'Error name is unknown.',
           };
 
-          throwRebuiltError(report);
+          const newError = rebuildError(report);
+
+          throw newError;
         }
       });
   }
@@ -113,12 +90,18 @@ export default function Error({
   reset: () => void;
 }) {
   const uid = UseUidContext();
-  const errorRecords = UseErrorRecordContext();
+  const errorRecords = UseErrorContext();
 
   const [status, setStatus] = useState<string>('Processing.');
 
   useEffect(() => {
-    handleError(uid.state.username, error, errorRecords, setStatus);
+    handleError(
+      uid.username,
+      error,
+      errorRecords.records,
+      errorRecords.setRecords,
+      setStatus
+    );
   }, []);
 
   return (

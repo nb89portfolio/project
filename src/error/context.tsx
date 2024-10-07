@@ -36,7 +36,7 @@ const initializeErrorRecord: ErrorContext = {
 const Context = createContext<ErrorContext>(initializeErrorRecord);
 
 function getCachedState(username: string) {
-  const cache = getLocalStorage<State>(username, 'user');
+  const cache = getLocalStorage<State>(username, 'error');
 
   const isValid = cache !== null;
 
@@ -48,7 +48,7 @@ function setCachedState(
   username: string,
   setState: Dispatch<SetStateAction<State>>
 ) {
-  setLocalStorage<State>(username, 'user', data, 24);
+  setLocalStorage<State>(username, 'error', data, 24);
   setState(data);
 }
 
