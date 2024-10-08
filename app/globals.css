@@ -8,6 +8,8 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 html,
@@ -17,23 +19,58 @@ body {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+
+  header {
+    padding: 1vh 1vw;
+    box-shadow: 0 1px 1px 0 grey;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    h1 {
+      font-size: smaller;
+      margin: 1vh 1vw;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: right;
+
+      a {
+        margin: 1vh 1vw;
+        font-size: smaller;
+      }
+    }
+  }
+
+  main {
+    padding: 1vh 1vw;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+      margin: 1vh 1vw;
+    }
+
+    output {
+      margin: 1vh 1vw;
+      color: red;
+      font-size: smaller;
+    }
+  }
+
+  footer {
+    padding: 1vh 1vw;
+    border-top: 1px solid grey;
+  }
 }
 
-header {
-  padding: 1vh 1vw;
-  box-shadow: 0 1px 1px 0 grey;
-}
-
-main {
-  padding: 1vh 1vw;
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-}
-
-footer {
-  padding: 1vh 1vw;
-  border-top: 1px solid grey;
+a {
 }
 
 button {
@@ -42,4 +79,20 @@ button {
   border-radius: 1vw;
   border: 1px solid grey;
   width: fit-content;
+  margin: 1vh 1vw;
+  cursor: pointer;
+}
+
+button:hover,
+a:hover {
+  opacity: 66%;
+  color: orange;
+  border-color: orange;
+}
+
+button:focus,
+a:focus {
+  opacity: 33%;
+  color: grey;
+  border-color: grey;
 }

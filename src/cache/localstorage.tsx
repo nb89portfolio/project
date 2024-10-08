@@ -34,27 +34,31 @@ export function setLocalStorage<Type>(
 }
 
 export function getLocalStorage<Type>(username: string, key: Key) {
-  const accessKey = username + key;
+  if (typeof window !== 'undefined') {
+    const accessKey = username + key;
 
-  const payloadString = localStorage.getItem(accessKey);
+    const payloadString = localStorage.getItem(accessKey);
 
-  const isNotNull = payloadString !== null;
+    const isNotNull = payloadString !== null;
 
-  if (!isNotNull) {
+    if (!isNotNull) {
+      return null;
+    }
+
+    const payloadData: Payload<Type> = JSON.parse(payloadString);
+
+    const currentHourlyTime = new Date().getHours();
+
+    const hourlyDifference = currentHourlyTime - payloadData.ttl.setHourlyTime;
+
+    const validTime = hourlyDifference < payloadData.ttl.hourlyLimit;
+
+    if (!validTime) {
+      return null;
+    }
+
+    return payloadData.data;
+  } else {
     return null;
   }
-
-  const payloadData: Payload<Type> = JSON.parse(payloadString);
-
-  const currentHourlyTime = new Date().getHours();
-
-  const hourlyDifference = currentHourlyTime - payloadData.ttl.setHourlyTime;
-
-  const validTime = hourlyDifference < payloadData.ttl.hourlyLimit;
-
-  if (!validTime) {
-    return null;
-  }
-
-  return payloadData.data;
 }
