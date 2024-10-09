@@ -13,10 +13,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Authentication {
+  id       Int    @id @default(autoincrement())
+  email    String
+  password String
+  Users    Users  @relation(fields: [usersId], references: [id])
+  usersId  Int    @unique
+}
+
 model Users {
-  id             Int              @id @default(autoincrement())
-  username       String
-  errorInstances ErrorInstances[]
+  id               Int              @id @default(autoincrement())
+  username         String
+  errorInstances   ErrorInstances[]
+  authenticationId Int
+  Authentication   Authentication?
 }
 
 model ErrorInstances {
