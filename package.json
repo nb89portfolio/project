@@ -1,14 +1,21 @@
 {
   "name": "project",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "types": "npx tsc",
+    "copy": "node ./tools/copy.js",
+    "server": "node ./dist/server.js",
+    "dev": "npm run types && npm run copy && npm run server"
   },
   "author": "",
   "license": "ISC",
   "description": "",
-  "devDependencies": {
+  "dependencies": {
     "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1"
   }
 }
