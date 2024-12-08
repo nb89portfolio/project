@@ -1,0 +1,1 @@
+Code Splitting: Webpack allows you to split your code into smaller chunks, which can be loaded asynchronously. This helps in optimizing the loading time of your application by loading only the necessary code when needed.
