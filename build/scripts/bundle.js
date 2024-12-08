@@ -1,0 +1,1 @@
+Module Bundling: Webpack bundles JavaScript files and their dependencies into a single file or smaller chunks, which can be loaded on demand. This helps in reducing the number of HTTP requests and improving the performance of your application.

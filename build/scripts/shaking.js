@@ -1,0 +1,1 @@
+Tree Shaking: Webpack can remove unused code from your bundle, reducing the final bundle size and improving performance.

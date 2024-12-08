@@ -5,10 +5,12 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0" />
-    <title>TypeScript Server</title>
+    <title>SSR with Hydration</title>
   </head>
   <body>
-    <div id="app">Hello, World!</div>
-    <script src="client.js"></script>
+    <div id="app">{{content}}</div>
+    <script
+      type="module"
+      src="/client.js"></script>
   </body>
 </html>

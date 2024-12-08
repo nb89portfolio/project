@@ -1,3 +1,6 @@
+.env
 node_modules
 dist
-dump
+build/cache
+build/output
+project.code-workspace
