@@ -1,7 +1,17 @@
 const entryPoint = 'app';
 
-const app = document.getElementById(entryPoint);
+function loadApp(entryPoint) {
+  const app = document.getElementById(entryPoint);
 
-const replacementNode = <p>"Client html page with script."</p>;
+  const createParagraph = document.createElement('p');
 
-const operation = app.replaceChildren(<p></p>);
+  const replacementText = 'Client html page scripted.';
+
+  createParagraph.textContent = replacementText;
+
+  console.log(createParagraph);
+
+  app.replaceChildren(createParagraph);
+}
+
+loadApp(entryPoint);
