@@ -13,11 +13,13 @@ function build(props: Props): void {
   try {
     const { typescriptCommand } = props;
 
-    const [data, error] = childProcess({ command: typescriptCommand });
+    const [data, error] = childProcess(typescriptCommand);
 
     if (error) {
       throw error;
     }
+
+    console.log(data as string);
   } catch (error) {
     const { name, message, stack } = defineError(error);
 
