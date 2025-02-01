@@ -5,7 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "typescript": "npx tsc",
-    "build": ""
+    "build": "npm run typescript",
+    "dev": "node ./src/server/server.js",
+    "do": "npm run build && npm run dev"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
   "homepage": "https://github.com/nb89portfolio/project#readme",
   "description": "",
   "devDependencies": {
+    "@types/node": "^22.13.0",
     "typescript": "^5.7.3"
   }
 }
