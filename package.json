@@ -5,9 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "typescript": "npx tsc",
-    "build": "npm run typescript",
-    "dev": "node ./src/server/server.js",
-    "do": "npm run build && npm run dev"
+    "copyfiles": "node ./dev/tools/copyFiles.js",
+    "dev": "npm run typescript && npm run copyfiles"
   },
   "repository": {
     "type": "git",
