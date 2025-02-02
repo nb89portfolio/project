@@ -1,27 +1,24 @@
 import { exec } from 'child_process';
 import { watch } from 'fs';
-import { join } from 'path';
+import { join, extname } from 'path';
 
-const srcDir = join('./', 'src');
+const script = 'npm run dev';
 
-const compileAndRun = () => {
-  exec('npx tsc && npm run do', (err, stdout, stderr) => {
+const runScript = () => {
+  exec(script, (err, stdout, stderr) => {
     if (err) {
       console.error(`Error: ${stderr}`);
     } else {
-      console.log(stdout);
+      console.log(`Output: ${stdout}`);
     }
   });
 };
 
-watch(srcDir, { recursive: true }, (eventType, filename) => {
-  if (filename === null) {
-  } else {
-    if (filename.endsWith('.ts')) {
-      console.log(`${filename} file changed. Recompiling and running...`);
-      compileAndRun();
-    }
+watch(join('./src'), { recursive: true }, (eventType, filename) => {
+  if (filename && ['.ts', '.html', '.css'].includes(extname(filename))) {
+    console.log(`${filename} file changed. Running script...`);
+    runScript();
   }
 });
 
-compileAndRun();
+runScript();

@@ -6,5 +6,6 @@ function dom({ id }: { id: string }) {
   const isNull = currentNode === null;
 
   if (isNull) {
+    throw new Error();
   }
 }

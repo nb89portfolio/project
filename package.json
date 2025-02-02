@@ -6,7 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "typescript": "npx tsc",
     "copyfiles": "node ./dev/tools/copyFiles.js",
-    "dev": "npm run typescript && npm run copyfiles"
+    "watch": "node ./dev/tools/watcher.js",
+    "server": "node ./dev/server/server.js",
+    "dev": "npm run typescript && npm run copyfiles && npm run server && npm run watch"
   },
   "repository": {
     "type": "git",
