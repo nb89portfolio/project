@@ -1,5 +1,28 @@
 {
-  "dependencies": {
+  "name": "project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typescript": "npx tsc",
+    "copyfiles": "node ./dev/tools/copyFiles.js",
+    "watch": "node ./dev/tools/watcher.js",
+    "serve": "node ./dev/server/server.js",
+    "dev": "npm run typescript && npm run copyfiles && npm run serve && npm run watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nb89portfolio/project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nb89portfolio/project/issues"
+  },
+  "homepage": "https://github.com/nb89portfolio/project#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.13.0",
     "typescript": "^5.7.3"
   }
 }
