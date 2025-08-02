@@ -1,4 +1,6 @@
-**/src/project/**
+**/src/project/client/**
+**/src/project/server/**
+**/src/project/database/**
 **/dist
 **/build
 **/node_modules
