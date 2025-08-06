@@ -1,4 +1,6 @@
 **/src/project/client/**
+!**/src/project/client/index.html
+!**/src/project/client/global.css
 **/src/project/server/**
 **/src/project/database/**
 **/dist
