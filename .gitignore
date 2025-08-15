@@ -1,8 +1,11 @@
-**/src/project/client/**
-!**/src/project/client/index.html
-!**/src/project/client/global.css
-**/src/project/server/**
-**/src/project/database/**
+**/src/project/pages/**
+!**/src/project/pages/index.html
+**/src/project/components/**
+**/src/project/scripts/client/**
+**/src/project/scripts/server/**
+**/src/project/scripts/database/**
+**/src/project/styles/**
+!**/src/project/styles/global.css
 **/dist
 **/build
 **/node_modules
